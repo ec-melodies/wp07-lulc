@@ -1,0 +1,3 @@
+python==2.6.6
+grassgis==6.4.3
+gdal==1.10
