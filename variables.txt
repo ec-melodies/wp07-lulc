@@ -1,0 +1,15 @@
+gisbase = "/usr/lib64/grass-6.4.2"
+gisdbase = "/application/GRASS_data"
+location = "World"
+mapset   = "National"
+non_grass_outputpath='/application/GRASS_data'
+image_path='/application/images/'
+imagelist= ['LE72040322000240EDC00','LE72040322000160EDC02']
+output="melodies"
+spatialr = '6'
+maxiter = '2000'
+ranger = '8,6'
+threshold = '1'
+minsize = '56'
+tilesize = '968'
+simplify = '0.3'
