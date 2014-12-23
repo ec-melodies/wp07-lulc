@@ -9,6 +9,7 @@ import urllib
 import imp
 from Gdalfunctions import *
 from otbfunctions import * 
+from getlandsat import * 
 
 #READ VARIABLES
 cwd = os.path.dirname(os.path.abspath(__file__))
@@ -23,9 +24,13 @@ getVarFromFile(variablesfile)
 gisbase = data.gisbase
 gisdbase = data.gisdbase
 location = data.location
+fetchtiles = data.fetchtiles
+years = data.years
 mapset   = data.mapset
 image_path=data.image_path
 imagelist = data.imagelist
+if imagelist=='':
+    imagelist=getlandsats(years,fetchtiles,image_path)
 output=data.output
 color_path= str(cwd).replace("\\", '/') + '/data_lulc_trends_legend2d'
 reclass_path= str(cwd).replace("\\", '/') + '/reclass_lucc'
