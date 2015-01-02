@@ -30,9 +30,7 @@ def getlandsats(years,tiles,outputdir):
 				print "Search interval: " + startdate + " to " +enddate + " - Bird: " + bird
 				subprocess.call('python '+LandsatDownloadProgdir+'download_landsat_scene.py -z unzip -b '+bird+' -o scene -d '+startdate+' -f '+enddate+' -c 5 -s '+tile+' -u '+LandsatDownloadProgdir+'usgs.txt --output '+outputdir, shell=True)
 				l = open(logfile,'r')
-				images=l.read().translate(None, "\n[]")
+				images=l.read().translate(None, '\n[]\'')
 				if images!='':		
-					downloaded.append(images)
-
+					downloaded=downloaded+images.split(',')
 	return downloaded		
-		
