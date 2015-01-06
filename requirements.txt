@@ -5,3 +5,4 @@ Landsat_LDOPE==1.7
 OTB==4.0.0
 wine.x86_64==1.6.1
 LANDSAT-Download==1.0 (https://github.com/olivierhagolle/LANDSAT-Download)
+Starspan==?? (https://github.com/Ecotrust/starspan)

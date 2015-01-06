@@ -254,9 +254,7 @@ for t in tiles:
             # print imported_img	   #DEBUG
             if imported_img.find('Dry')>=0 and imported_img.find(t)>=0 and imported_img.find(y)>=0:
                     name_dry=imported_img
-                    dryndvitif=non_grass_outputpath+'/'+name_dry.replace('band','ndvi')+'.tif'					
                     valid_seasons_imgs=valid_seasons_imgs+1
-                    grass.run_command("r.out.gdal", input=name_dry.replace('band','ndvi'), output=dryndvitif)
             if imported_img.find('Wet')>=0 and imported_img.find(t)>=0 and imported_img.find(y)>=0:
                     name_wet=imported_img
                     valid_seasons_imgs=valid_seasons_imgs+1
@@ -279,6 +277,10 @@ for t in tiles:
                                         name_dry.replace('band','band7')], 
                               output=output)
             # print 'i.lulc ->'+str(p)    #DEBUG
+			# export NDVI from the dry season to tif
+            dryndvitif=non_grass_outputpath+'/'+name_dry.replace('band','ndvi')+'.tif'					
+            grass.run_command("r.out.gdal", input=name_dry.replace('band','ndvi'), output=dryndvitif)
+            # append generated lulc's to a list which will be processed further			
             generatedlulc = get_lulc_files(mapset, data.output+t+"*_LULC")
             if p!=0 and output+'_LULC' not in generatedlulc:
                 generatedlulc.append(output+'_LULC')
