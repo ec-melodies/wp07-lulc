@@ -3,10 +3,12 @@
 # verify 
 cat $HOME/wp07-lulc/main.sh
  
-# make it executable
+# make required files executable
 chmod u+x $HOME/wp07-lulc/main.sh
 chmod u+x $HOME/wp07-lulc/lib/r.in.landsat.new.py
 chmod u+x $HOME/wp07-lulc/lib/i.lulc.national.py
+chmod u+x $HOME/wp07-lulc/bin/i.outdetect.exe
+chmod u+x $HOME/wp07-lulc/bin/i.ldc.exe
  
 # define job file as environmental variable
 export GRASS_BATCH_JOB=$HOME/wp07-lulc/main.sh
