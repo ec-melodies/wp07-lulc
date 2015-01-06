@@ -9,7 +9,7 @@ To run the process please follow the following steps:
 
 1) Clone this repository to your Unix system:
 
-`       git clone https://github.com/ec-melodies/wp07-lulc`
+`       git clone git@github.com:ec-melodies/wp07-lulc.git`
 
 2) Make sure all required dependencies are installed (see ~/requirements.txt);
 

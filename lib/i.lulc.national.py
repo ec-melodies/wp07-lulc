@@ -148,7 +148,10 @@ def main():
            eliminate_rastermaps([NDVItemp1])		            
            grass.fatal(_("Unable to normalize NDVI map from image 1. Please review selected input files."))		        
     
-    ndvi_normalizer(band_ndvi2, NDVItemp2, t_srx,proj_units)
+    p=ndvi_normalizer(band_ndvi2, NDVItemp2, t_srx,proj_units)
+	# export NDVI from the dry season to tif
+    dryndvitif='$HOME/'+band_ndvi2+'.tif'					
+    grass.run_command("r.out.gdal", input=NDVItemp2, output=dryndvitif)	
     if p==-1:
             eliminate_rastermaps([NDVItemp1,NDVItemp2])		
             grass.fatal(_("Unable to normalize NDVI map from image 2. Please review selected input files."))		            

@@ -277,9 +277,9 @@ for t in tiles:
                                         name_dry.replace('band','band7')], 
                               output=output)
             # print 'i.lulc ->'+str(p)    #DEBUG
-			# export NDVI from the dry season to tif
-            dryndvitif=non_grass_outputpath+'/'+name_dry.replace('band','ndvi')+'.tif'					
-            grass.run_command("r.out.gdal", input=name_dry.replace('band','ndvi'), output=dryndvitif)
+			# # export NDVI from the dry season to tif
+            # dryndvitif=non_grass_outputpath+'/'+name_dry.replace('band','ndvi')+'.tif'					
+            # grass.run_command("r.out.gdal", input=name_dry.replace('band','ndvi'), output=dryndvitif)
             # append generated lulc's to a list which will be processed further			
             generatedlulc = get_lulc_files(mapset, data.output+t+"*_LULC")
             if p!=0 and output+'_LULC' not in generatedlulc:
