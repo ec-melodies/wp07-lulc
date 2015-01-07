@@ -6,7 +6,7 @@ cat $HOME/wp07-lulc/main.sh
 # make required files executable
 chmod u+x $HOME/wp07-lulc/main.sh
 chmod u+x $HOME/wp07-lulc/lib/r.in.landsat.new.py
-#chmod 555 $HOME/wp07-lulc/lib/i.lulc.national.py
+chmod 755 $HOME/wp07-lulc/lib/i.lulc.national.py
 chmod u+x $HOME/wp07-lulc/extlib/i.outdetect.exe
 chmod u+x $HOME/wp07-lulc/extlib/i.ldc.exe
 
@@ -20,7 +20,7 @@ basepath=/usr/lib64/qt-3.3/bin:/usr/local/bin:/bin:/usr/bin:/usr/local/sbin:/usr
  
 # define environment variables
 export GRASS_BATCH_JOB=$HOME/wp07-lulc/main.sh
-export PATH=$basepath:$Lib:$Extlib:$LANDSATDownload:$Starspan
+export PATH=$basepath:$Lib:$Extlib:$LANDSATDownload:$Starspan:$Landsat_LDOPE
 export PYTHONPATH=$Lib
 export LD_LIBRARY_PATH=/usr/local/lib/otb
 export GDAL_DATA=/application/gdal
@@ -32,5 +32,3 @@ grass64 -text ~/wp07-lulc/GRASS_data/World/National/
  
 # switch back to interactive mode
 unset GRASS_BATCH_JOB
-
-exec $SHELL -i
