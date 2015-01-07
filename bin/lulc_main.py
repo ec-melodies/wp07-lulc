@@ -1,15 +1,15 @@
 #!/usr/bin/python
  
-import os
-import sys
-import datetime
+import os,sys,datetime,imp
 import grass.script as grass
 import grass.script.setup as gsetup
 import urllib
-import imp
 from Gdalfunctions import *
 from otbfunctions import * 
 from getlandsat import * 
+
+#get start time
+starttime=datetime.datetime.now()
 
 #READ VARIABLES
 cwd = os.path.dirname(os.path.abspath(__file__))
@@ -44,9 +44,6 @@ simplify = data.simplify
 non_grass_outputpath = data.non_grass_outputpath
 filelist=non_grass_outputpath + '/filelist.txt'
 
-#get start time
-starttime=datetime.datetime.now()
- 
 def read_landsat_metadata(image_path,image_name):
     output_list=[]
     fields = ['DATE_ACQUIRED',
@@ -248,7 +245,7 @@ for t in tiles:
     grass.message("Processing image " + str(cont) + " out of " + str(len(tiles)))
     for y in yearofimportedimgs:
         output=data.output+t+'_'+y
-        #print imported    #DEBUG
+        # print imported    #DEBUG
         valid_seasons_imgs=0
         for imported_img in imported:
             # print imported_img	   #DEBUG
@@ -259,6 +256,7 @@ for t in tiles:
                     name_wet=imported_img
                     valid_seasons_imgs=valid_seasons_imgs+1
         fu = grass.find_file(element = 'cell', name = output+'_LULC@'+mapset)
+        # print fu   #DEBUG
         if valid_seasons_imgs>=2 and fu.get('fullname')=='':
             p=grass.read_command("i.lulc.national.py", 
                               input1st=[name_wet.replace('band','band1'), 
@@ -277,9 +275,6 @@ for t in tiles:
                                         name_dry.replace('band','band7')], 
                               output=output)
             # print 'i.lulc ->'+str(p)    #DEBUG
-			# # export NDVI from the dry season to tif
-            # dryndvitif=non_grass_outputpath+'/'+name_dry.replace('band','ndvi')+'.tif'					
-            # grass.run_command("r.out.gdal", input=name_dry.replace('band','ndvi'), output=dryndvitif)
             # append generated lulc's to a list which will be processed further			
             generatedlulc = get_lulc_files(mapset, data.output+t+"*_LULC")
             if p!=0 and output+'_LULC' not in generatedlulc:
@@ -296,7 +291,7 @@ for t in tiles:
         generatedlulc = get_lulc_files(mapset, data.output+t+"*_LULC")
         #generatedgenlulc___ = get_lulc_files(mapset, data.output+t+"*_LULC_gen")		
         #print "generatedgenlulc___: " + str(generatedgenlulc___)     #DEBUG
-        grass.message("LULCs para generalizar " + str(generatedlulc))   #DEBUG			
+        # grass.message("LULCs para generalizar " + str(generatedlulc))   #DEBUG			
         for lulcmap in generatedlulc:	
             gen_lulcmap= lulcmap+'_gen'	
             #print all_gens.get(lulcmap)	

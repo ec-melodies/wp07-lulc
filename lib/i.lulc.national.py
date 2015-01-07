@@ -150,7 +150,8 @@ def main():
     
     p=ndvi_normalizer(band_ndvi2, NDVItemp2, t_srx,proj_units)
 	# export NDVI from the dry season to tif
-    dryndvitif='$HOME/'+band_ndvi2+'.tif'					
+    dryndvitif='$HOME/wp07-lulc/GRASS_data/'+band_ndvi2+'.tif'
+    grass.message("Converting NDVI from the dry season to tif: "+str(dryndvitif))		
     grass.run_command("r.out.gdal", input=NDVItemp2, output=dryndvitif)	
     if p==-1:
             eliminate_rastermaps([NDVItemp1,NDVItemp2])		
