@@ -13,7 +13,7 @@ starttime=datetime.datetime.now()
 
 #READ VARIABLES
 cwd = os.path.dirname(os.path.abspath(__file__))
-variablesfile= str(cwd).replace("\\", '/') + '/variables.txt'
+variablesfile= './wp07-lulc/variables.txt'
 def getVarFromFile(filename):
     import imp
     f = open(filename)
@@ -32,8 +32,8 @@ imagelist = data.imagelist
 if imagelist=='':
     imagelist=getlandsats(years,fetchtiles,image_path)
 output=data.output
-color_path= str(cwd).replace("\\", '/') + '/data_lulc_trends_legend2d'
-reclass_path= str(cwd).replace("\\", '/') + '/reclass_lucc'
+color_path= './wp07-lulc/symbology/data_lulc_trends_legend2d'
+reclass_path= './wp07-lulc/symbology/reclass_lucc'
 spatialr = data.spatialr
 maxiter = data.maxiter
 ranger = data.ranger
@@ -355,7 +355,7 @@ for t in tiles:
                 grass.message(_("Integrating segments and raster LULC values..."))
                 #calculate areas and id for each segment				
                 calculateidandareas(vect_out)			
-                #print os.system('starspan2 --vector '+vect_out +' --raster ' + lulcmaptif + ' --out-prefix ' +  output_stats + ' --out-type table --nodata 0 --skip_invalid_polys --elapsed_time --mask '+mask +' --summary-suffix _summary.csv --stats mode --fields ID --noColRow --noXY --RID none')			
+                # print os.system('starspan2 --vector '+vect_out +' --raster ' + lulcmaptif + ' --out-prefix ' +  output_stats + ' --out-type table --nodata 0 --skip_invalid_polys --elapsed_time --mask '+mask +' --summary-suffix _summary.csv --stats mode --fields ID --noColRow --noXY --RID none')			
                 # integratesegmentationandraster (lulcmaptif,output_stats+'_summary.csv',vect_out)
                 #join
                 #join_segments_and_csv(vect_out,output_stats+'_summary.csv')

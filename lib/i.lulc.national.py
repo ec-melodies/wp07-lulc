@@ -293,7 +293,7 @@ def main():
         grass.run_command("g.remove", group=group_name, flags="f", quiet=True)		  		   	   
         grass.fatal(_('For some reason DWE-IS and GRASS is not being able to find a recode table for producing training areas signatures. Try again and if the problem persists, please reinstall DWE-IS.'))
     else:	
-        recode_path= "/application/dweis/recode"
+        recode_path= "./wp07-lulc/symbology/recode"
         print recode_path		#Debug
         check_file= os.path.isfile(recode_path)	
         print "recode check is: " + str(check_file)   #Debug
@@ -416,7 +416,7 @@ def main():
         grass.warning(_('For some reason DWE-IS and GRASS is not being able to find DWE-IS installation folder. Land Use/Cover product with labels can not be produced.'))           
         grass.warning(_('DWE-IS is not able to find DWE-IS Reclass file. Land Use/Cover product with labels can not be produced.'))              			
     else:
-        label_path= "/application/dweis/" + "labels_reclass" 
+        label_path= "./wp07-lulc/symbology/" + "labels_reclass" 
         check_file= os.path.isfile(label_path)    					
         if check_file==True:
             p=grass.run_command('r.reclass', input=output, output=output_label, rules=label_path, quiet=True)	
@@ -434,7 +434,7 @@ def main():
         grass.run_command('r.colors', map = output, rules = "grey", quiet=True)	
         grass.run_command('r.colors', map = output_label, rules = "grey", quiet=True)			
     else:
-        color_path= "/application/dweis/color/dwecolor" 
+        color_path= "./wp07-lulc/symbology/color/dwecolor" 
         check_file= os.path.isfile(color_path)    			
         if check_file==True:
             p=grass.run_command('r.colors', map = output, rules = color_path, quiet=True)
