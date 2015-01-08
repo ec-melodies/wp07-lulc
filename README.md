@@ -13,7 +13,7 @@ To run the process please follow the following steps:
 
 2) Make sure all required dependencies are installed (see ~/requirements.txt);
 
-3) Define your parameters in ~/bin/variables.txt;
+3) Define your parameters in ~/variables.txt;
 
 4) Initiate the process with: 
 
