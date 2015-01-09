@@ -17,7 +17,11 @@
 import os, imp
 import subprocess
 
-def getlandsats(years,tiles,outputdir):
+def getlandsats(years,tiles,admitedcloudcover,outputdir):
+    if admitedcloudcover==None:
+        admitedcloudcover=''
+    else:
+        admitedcloudcover=' -c '+admitedcloudcover
 	seasonintervals=['0101-0630','0701-0730']
 	LandsatDownloadProgdir ='/home/melodies-wp7/LANDSAT-Download/'
 	logfile = os.path.join(outputdir,'log.txt')
@@ -28,7 +32,7 @@ def getlandsats(years,tiles,outputdir):
 				startdate=year+season.split('-')[0]
 				enddate=year+season.split('-')[1]
 				print "Search interval: " + startdate + " to " +enddate + " - Bird: " + bird
-				subprocess.call('python '+LandsatDownloadProgdir+'download_landsat_scene.py -z unzip -b '+bird+' -o scene -d '+startdate+' -f '+enddate+' -c 5 -s '+tile+' -u '+LandsatDownloadProgdir+'usgs.txt --output '+outputdir, shell=True)
+				subprocess.call('python '+LandsatDownloadProgdir+'download_landsat_scene.py -z unzip -b '+bird+' -o scene -d '+startdate+' -f '+enddate+admitedcloudcover+' -s '+tile+' -u '+LandsatDownloadProgdir+'usgs.txt --output '+outputdir, shell=True)
 				l = open(logfile,'r')
 				images=l.read().translate(None, '\n[]\'')
 				if images!='':		

@@ -28,12 +28,15 @@ fetchtiles = data.fetchtiles
 years = data.years
 mapset   = data.mapset
 image_path=data.image_path
+admitedcloudcover = data.admitedcloudcover
 imagelist = data.imagelist
 if imagelist=='':
-    imagelist=getlandsats(years,fetchtiles,image_path)
+    imagelist=getlandsats(years,fetchtiles,admitedcloudcover,image_path)
+print imagelist   #DEBUG
 output=data.output
 color_path= './wp07-lulc/symbology/data_lulc_trends_legend2d'
 reclass_path= './wp07-lulc/symbology/reclass_lucc'
+MMU = data.MMU
 spatialr = data.spatialr
 maxiter = data.maxiter
 ranger = data.ranger
@@ -297,7 +300,7 @@ for t in tiles:
             #print all_gens.get(lulcmap)	
             if all_gens.get('fullname')=='':
                 try:			
-                    generalize_lulc(lulcmap,gen_lulcmap,1,False)
+                    generalize_lulc(lulcmap,gen_lulcmap,int(MMU),False)
                     generatedgenlulc.append(gen_lulcmap)
                 except:
                     grass.warning(_("Unable to generalize "+lulcmap))				
@@ -355,12 +358,12 @@ for t in tiles:
                 grass.message(_("Integrating segments and raster LULC values..."))
                 #calculate areas and id for each segment				
                 calculateidandareas(vect_out)			
-                # print os.system('starspan2 --vector '+vect_out +' --raster ' + lulcmaptif + ' --out-prefix ' +  output_stats + ' --out-type table --nodata 0 --skip_invalid_polys --elapsed_time --mask '+mask +' --summary-suffix _summary.csv --stats mode --fields ID --noColRow --noXY --RID none')			
-                # integratesegmentationandraster (lulcmaptif,output_stats+'_summary.csv',vect_out)
+                print os.system('starspan --vector '+vect_out +' --raster ' + lulcmaptif + ' --out-prefix ' +  output_stats + ' --out-type table --nodata 0 --skip_invalid_polys --elapsed_time --mask '+mask +' --summary-suffix _summary.csv --stats mode --fields ID --noColRow --noXY --RID none')			
+                integratesegmentationandraster (lulcmaptif,output_stats+'_summary.csv',vect_out)
                 #join
-                #join_segments_and_csv(vect_out,output_stats+'_summary.csv')
-                #print os.system('ogr2ogr -overwrite ' + vect_out + ' ' + vect_out.replace('.shp','_join.shp'))
-                #remove_shapefile(vect_out.replace('.shp','_join.shp'))		
+                join_segments_and_csv(vect_out,output_stats+'_summary.csv')
+                print os.system('ogr2ogr -overwrite ' + vect_out + ' ' + vect_out.replace('.shp','_join.shp'))
+                remove_shapefile(vect_out.replace('.shp','_join.shp'))		
  
 #    CHECK FOR MORE THAN ONE LULC MAP AND GENERATE LULC CHANGES MAP      
     if len(generatedgenlulc)>=2:
@@ -387,7 +390,7 @@ for t in tiles:
                 applyreclass(reclass_path, lulcchanges, temp)
                 p=grass.mapcalc("$out=if($B1<0,null(),$B1)", out=lulcchangesreclass, B1=temp)
 				#generalize LUCC
-                generalize_lulc(lulcchangesreclass,lulcchangesgen,1,True)	
+                generalize_lulc(lulcchangesreclass,lulcchangesgen,int(MMU),True)	
                 #apply color map			
                 applycolormap(color_path, lulcchangesgen)
                 #export to tif			
