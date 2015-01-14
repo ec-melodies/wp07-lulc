@@ -21,5 +21,6 @@ To run the process please follow the following steps:
 4) Initiate the process with: 
 
 `       sh $HOME/wp07-lulc/ini.sh   #UNIX`
+
 `       double click ~/ini.bat   #W32`
 
