@@ -300,7 +300,7 @@ def main():
         grass.run_command("g.remove", group=group_name, flags="f", quiet=True)		  		   	   
         grass.fatal(_('For some reason DWE-IS and GRASS is not being able to find a recode table for producing training areas signatures. Try again and if the problem persists, please reinstall DWE-IS.'))
     else:
-        recode_path= os.join.path(platform,"/symbology/recode")
+        recode_path= os.path.join(platform,"symbology","recode")
         print recode_path		#Debug
         check_file= os.path.isfile(recode_path)	
         print "recode check is: " + str(check_file)   #Debug
