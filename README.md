@@ -9,7 +9,7 @@ To run the process please follow the following steps:
 
 1) Clone this repository to your system:
 
-`       UNIX - git clone git@github.com:ec-melodies/wp07-lulc.git`  
+`       git clone git@github.com:ec-melodies/wp07-lulc.git   #UNIX`  
 `       download latest release and unzip   #W32`
 
 2) Make sure all required dependencies are installed (see ~/requirements.txt);
@@ -20,6 +20,6 @@ To run the process please follow the following steps:
 
 4) Initiate the process with: 
 
-`       sh $HOME/wp07-lulc/ini.sh
-        double click ~/ini.bat`
+`       sh $HOME/wp07-lulc/ini.sh   #UNIX`
+`       double click ~/ini.bat   #W32`
 
