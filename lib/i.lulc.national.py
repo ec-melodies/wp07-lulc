@@ -48,6 +48,13 @@ import sys
 import os
 
 def main():
+    # OS definitions
+    dirname=os.path.dirname	
+    if sys.platform.startswith('win'):	  #W32			
+        platform =dirname(dirname(__file__))
+    elif sys.platform.startswith('linux'):    #UNIX			
+        platform ='./wp07-lulc'
+		
     #Get projection units
     proj_units=get_projection_units()
     
@@ -150,7 +157,7 @@ def main():
     
     p=ndvi_normalizer(band_ndvi2, NDVItemp2, t_srx,proj_units)
 	# export NDVI from the dry season to tif
-    dryndvitif='./wp07-lulc/GRASS_data/'+band_ndvi2.replace('@'+t_mapset,'')+'.tif'
+    dryndvitif=os.path.join(platform,'GRASS_data',band_ndvi2.replace('@'+t_mapset,'')+'.tif')
     grass.message("Converting NDVI from the dry season to tif: "+str(dryndvitif))		
     grass.run_command("r.out.gdal", input=NDVItemp2, output=dryndvitif)	
     if p==-1:
@@ -292,8 +299,8 @@ def main():
         eliminate_rasterlists('myscript.tmp*', t_mapset)    	   
         grass.run_command("g.remove", group=group_name, flags="f", quiet=True)		  		   	   
         grass.fatal(_('For some reason DWE-IS and GRASS is not being able to find a recode table for producing training areas signatures. Try again and if the problem persists, please reinstall DWE-IS.'))
-    else:	
-        recode_path= "./wp07-lulc/symbology/recode"
+    else:
+        recode_path= os.join.path(platform,"/symbology/recode")
         print recode_path		#Debug
         check_file= os.path.isfile(recode_path)	
         print "recode check is: " + str(check_file)   #Debug
@@ -416,7 +423,7 @@ def main():
         grass.warning(_('For some reason DWE-IS and GRASS is not being able to find DWE-IS installation folder. Land Use/Cover product with labels can not be produced.'))           
         grass.warning(_('DWE-IS is not able to find DWE-IS Reclass file. Land Use/Cover product with labels can not be produced.'))              			
     else:
-        label_path= "./wp07-lulc/symbology/" + "labels_reclass" 
+        label_path= os.path.join(platform,'symbology',"labels_reclass")
         check_file= os.path.isfile(label_path)    					
         if check_file==True:
             p=grass.run_command('r.reclass', input=output, output=output_label, rules=label_path, quiet=True)	
@@ -434,7 +441,7 @@ def main():
         grass.run_command('r.colors', map = output, rules = "grey", quiet=True)	
         grass.run_command('r.colors', map = output_label, rules = "grey", quiet=True)			
     else:
-        color_path= "./wp07-lulc/symbology/color/dwecolor" 
+        color_path= os.path.join(platform,'symbology','color','dwecolor') 
         check_file= os.path.isfile(color_path)    			
         if check_file==True:
             p=grass.run_command('r.colors', map = output, rules = color_path, quiet=True)

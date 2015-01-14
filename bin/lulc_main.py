@@ -12,8 +12,9 @@ from getlandsat import *
 starttime=datetime.datetime.now()
 
 #READ VARIABLES
-cwd = os.path.dirname(os.path.abspath(__file__))
-variablesfile= './wp07-lulc/variables.txt'
+dirname=os.path.dirname
+appdir=os.path.abspath(os.path.join(os.path.dirname(__file__),".."))
+variablesfile= os.path.join(appdir,'variables.txt')
 def getVarFromFile(filename):
     import imp
     f = open(filename)
@@ -34,8 +35,8 @@ if imagelist=='':
     imagelist=getlandsats(years,fetchtiles,admitedcloudcover,image_path)
 print imagelist   #DEBUG
 output=data.output
-color_path= './wp07-lulc/symbology/data_lulc_trends_legend2d'
-reclass_path= './wp07-lulc/symbology/reclass_lucc'
+color_path= os.path.join(dirname(__file__),'symbology','data_lulc_trends_legend2d')
+reclass_path= os.path.join(dirname(__file__),'symbology','reclass_lucc')
 MMU = data.MMU
 spatialr = data.spatialr
 maxiter = data.maxiter
@@ -184,7 +185,7 @@ def landsat8_QAmask(inputQAband):
 #Setup Grass GISbase, GISdbase, location and mapset
 gsetup.init(gisbase,
             gisdbase, location, mapset)
- 
+
 #IMPORT AND PRE-PROCESS LANDSAT IMAGES FROM imagelist
 imported=[]
 yearofimportedimgs=[]  

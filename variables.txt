@@ -1,12 +1,12 @@
-gisbase = "/home/melodies-wp7/wp07-lulc"
-gisdbase = "/home/melodies-wp7/wp07-lulc/GRASS_data"
+gisbase = "C:\Users\Administrator\Documents\GitHub\wp07-lulc-w32"
+gisdbase = "C:\Users\Administrator\Documents\GitHub\wp07-lulc-w32\GRASS_data"
 location = "World"
 mapset   = "National"
-non_grass_outputpath='/home/melodies-wp7/wp07-lulc/GRASS_data'
-image_path='/application/images/'
+non_grass_outputpath='X:\geodata-processed\melodies_nongrass'
+image_path='X:/geodata-sources/landsat-series/'
 years={'2013':'LC8'}
 fetchtiles=['203034']
-imagelist=''
+imagelist=['LT52040332010115MPS00','LT52040332010211MPS00']
 admitedcloudcover='35'
 MMU='5'
 output="melodies"

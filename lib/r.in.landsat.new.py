@@ -627,6 +627,7 @@ def import_landsat(src_file, target_file, band, source_location, t_srx, proj_uni
      
     #create temporary file to hold gdalwarp output before importing to GRASS
     tempfile = grass.read_command("g.tempfile", pid = os.getpid()).strip() + '.tif'
+    tempfile = os.path.normpath(tempfile)
  
     #get projection information from Landsat image
     p=proj_image = grass.read_command('g.proj', flags = 'jf', georef = src_file).strip()   	
@@ -649,7 +650,6 @@ def import_landsat(src_file, target_file, band, source_location, t_srx, proj_uni
     if proj_image in proj_location:
         #import geotiff to GRASS
         p=grass.run_command("r.in.gdal", flags= 'ok', overwrite = 'o', input = src_file, output = target_file)      
-        print 'grass.run_command("r.in.gdal", flags= ok, overwrite = o, input = '+src_file+', output = '+target_file+')'
         if p!=0:
            grass.fatal(_("GRASS was unable to import Landsat image. Please review selected input raster map and/or Locations Projection/Coordinate system."))
     else:
@@ -668,13 +668,17 @@ def import_landsat(src_file, target_file, band, source_location, t_srx, proj_uni
             grass.fatal(_('DWEIS+GRASS location not defined. Please uninstall DWE-IS tool and reinstall.'))        
 
         # Define path to GDAL18's gdalwarp
-        # gdal18path= gisbase + '/gdal18'  #ORIGINAL
-        gdal18path= '/usr/bin/'
+        if sys.platform.startswith('win'):	  #W32	
+            gdal18path = os.getenv('OSGEO4W')		
+            gdalwarppath= os.path.join(gdal18path,'gdalwarp.exe')
+        elif sys.platform.startswith('linux'):    #UNIX
+            gdal18path= '/usr/bin/'    
+            gdalwarppath= gdal18path +'gdalwarp'			
+		
         check_folder= os.path.isdir(gdal18path)
         if check_folder==False:
             grass.fatal(_('GDAL16 cannot be found in DWE-IS system. Please uninstall DWE-IS tool and reinstall.'))    
-        # gdalwarppath= gdal18path + '/bin/' + 'gdalwarp.exe'   #ORIGINAL
-        gdalwarppath= gdal18path +'gdalwarp'
+
         check_file= os.path.isfile(gdalwarppath)
         if check_file==False:
             grass.fatal(_('GDALWARP.exe from GDAL18 cannot be found in DWE-IS system. Please uninstall DWE-IS and reinstall.'))            
@@ -682,11 +686,13 @@ def import_landsat(src_file, target_file, band, source_location, t_srx, proj_uni
         # # Get current GDAL_DATA
         current_gdaldata=os.environ["GDAL_DATA"]
 
-        # Define new GDAL_DATA                        
-        # target_gdaldata= gisbase + '/gdal18/gdal/'   #ORIGINAL
-        target_gdaldata= '/application/gdal/'		
+        # Define new GDAL_DATA
+        if sys.platform.startswith('win'):	  #W32			
+            target_gdaldata= os.path.join(gisbase,'gdal')   #ORIGINAL
+        elif sys.platform.startswith('linux'):    #UNIX			
+            target_gdaldata= '/application/gdal/'		
         check_folder= os.path.isdir(target_gdaldata)
-        print check_folder		
+        # print check_folder		
         if check_file==False:
             grass.fatal(_('GDAL18 GDAL_DATA folder cannot be found in DWE-IS system. Please uninstall DWE-IS tool and reinstall.'))            
         os.environ['GDAL_DATA']=target_gdaldata   
@@ -695,8 +701,11 @@ def import_landsat(src_file, target_file, band, source_location, t_srx, proj_uni
             cmd= "\"" + gdalwarppath + "\"" + ' -t_srs ' + "\"" + proj_location + "\"" + ' -srcnodata ' + no_value + ' -dstnodata ' + no_value  + ' -tr ' + t_srx + ' ' + t_srx + ' ' + src_file + ' ' + tempfile
         else:
             cmd= "\"" + gdalwarppath + "\"" + ' -t_srs ' + "\"" + proj_location + "\"" + ' -srcnodata ' + no_value + ' -dstnodata ' + no_value  + ' ' + src_file + ' ' + tempfile
-        p = grass.call(shlex.split(cmd))	#for UNIX	
-        # p = grass.call(cmd)    #for W32
+        if sys.platform.startswith('win'):	  #W32
+            p = grass.call(cmd)    	
+        elif sys.platform.startswith('linux'):    #UNIX				
+            p = grass.call(shlex.split(cmd))		
+ 
         #check to see if gdalwarp executed properly
         if p!=0:        
            grass.fatal(_("GDAL was not able to reproject image to Location's coordinate system. Please review selected input raster map and/or Locations Projection/Coordinate system."))
