@@ -330,11 +330,12 @@ for t in tiles:
             vect_out=lulcmaptif.replace('.tif', '_segm.shp')
             mask=lulcmaptif.replace('.tif', '_mask.tif')
             output_stats=lulcmaptif.replace('.tif', '_sts')
-            #Segmentation
-            try:
-                with open(vect_out) as f: pass
+            driver = ogr.GetDriverByName('ESRI Shapefile')
+            dataSource = driver.Open(vect_out, 0)	
+            #Segmentation			
+            if dataSource!=None:
                 grass.message(_("Segmented map already exists. Skipping the segmentation process..."))
-            except:   
+            else:   
                 #create a mask
                 try:
                     with open(mask) as f: pass
@@ -342,7 +343,7 @@ for t in tiles:
                     print os.system('gdal_calc.py -A ' + lulcmaptif + ' --A_band 1 --outfile=' + mask + ' --calc="A>0" --overwrite') 
                 #perform segmentation GRASS 7
 #                 grass.run_command("i.segment", group='te', output='lixolcover_sgm', threshold='0.6', minsize=minsize)
-                #perform segmentation
+                #perform segmentation		
                 s=otbsegmentation(lulcmaptif,mask,spatialr,maxiter,ranger,threshold,minsize,tilesize,simplify,vect_out)
     			#clean vector in grass
                 grass.message(_("Cleaning segments in GRASS..."))
@@ -369,6 +370,8 @@ for t in tiles:
 #    CHECK FOR MORE THAN ONE LULC MAP AND GENERATE LULC CHANGES MAP      
     if len(generatedgenlulc)>=2:
 	    # Loop thru all lulc for current tile and select min and max year as start and end for the change detection
+        start_lulc=''
+        end_lulc=''		
         for lulcmap in generatedgenlulc:
             if lulcmap.find('_'+str(min(yearofimportedimgs)))>=0:
                 start_lulc=lulcmap
