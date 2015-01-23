@@ -88,15 +88,6 @@ def read_landsat_metadata(image_path,image_name):
     # print output_list   #DEBUG
     return output_list
  
-def Calculate_season(image_aquisition,region):
-    if region=='Portugal':
-        if 173<int(image_aquisition[13:16])<295:
-            season='Dry'
-        else:
-            season='Wet'
-    print season		
-    return season
- 
 def image_bands(image_path,image_name,sensortype):
     output_band_list=[]
     if sensortype=='5TM':
