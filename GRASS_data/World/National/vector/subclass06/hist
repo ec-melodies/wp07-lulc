@@ -1,8 +1,8 @@
-COMMAND: v.in.ogr dsn="C:\x\Projectos\ec_melodies\subclass06_clcspain_wgs84_grid.shp" output="subclass06" min_area=0.0001 snap=0.00001
-GISDBASE: C:\simulate_then_lixo\geodata-processed\GRASS_data
-LOCATION: World MAPSET: National USER: vbnunes DATE: Thu Jul 17 15:33:36 2014
+COMMAND: v.in.ogr -o dsn="\\tsclient\C\x\Projectos\ec_melodies\trunk\implementation\sample_set\subclass06.shp" output="subclass06" min_area=0.0001 snap=0.00001
+GISDBASE: C:\Users\Administrator\Documents\GitHub\wp07-lulc\GRASS_data
+LOCATION: World MAPSET: National USER: Administrator DATE: Mon Jan 26 11:21:12 2015
 -----------------------------------------------------
-3425 input polygons
-Total area: 9.63909E+008 (3417 areas)
+21128 input polygons
+Total area: 1.60526E+018 (19724 areas)
 Overlapping area: 0 (0 areas)
-Area without category: 0 (0 areas)
+Area without category: 3.10072E+015 (27 areas)

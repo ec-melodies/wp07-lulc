@@ -1,1 +1,1 @@
-1/subclass06_clcspain_wgs84_grid subclass06 cat $GISDBASE/$LOCATION_NAME/$MAPSET/dbf/ dbf
+1/subclass06 subclass06 cat $GISDBASE/$LOCATION_NAME/$MAPSET/dbf/ dbf
