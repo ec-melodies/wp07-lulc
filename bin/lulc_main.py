@@ -242,16 +242,18 @@ for t in tiles:
         output=data.output+t+'_'+y
         # print imported    #DEBUG
         valid_seasons_imgs=0
+        name_dry = None
+        name_wet = None		
         for imported_img in imported:
             # print imported_img	   #DEBUG
-            if imported_img.find('Dry')>=0 and imported_img.find(t)>=0 and imported_img.find(y)>=0:
+            print str(valid_seasons_imgs)
+            if imported_img.find('Dry')>=0 and imported_img.find(t)>=0 and imported_img.find(y)>=0 and name_dry == None:
                     name_dry=imported_img
                     valid_seasons_imgs=valid_seasons_imgs+1
-            if imported_img.find('Wet')>=0 and imported_img.find(t)>=0 and imported_img.find(y)>=0:
+            if imported_img.find('Wet')>=0 and imported_img.find(t)>=0 and imported_img.find(y)>=0 and name_wet == None:
                     name_wet=imported_img
                     valid_seasons_imgs=valid_seasons_imgs+1
         fu = grass.find_file(element = 'cell', name = output+'_LULC@'+mapset)
-        # print fu   #DEBUG
         if valid_seasons_imgs>=2 and fu.get('fullname')=='':
             p=grass.read_command("i.lulc.national.py", 
                               input1st=[name_wet.replace('band','band1'), 
