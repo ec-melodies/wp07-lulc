@@ -33,7 +33,7 @@ def checkseasonimg(year,season,tile,dir):
     for f in all:
         if os.path.isdir(os.path.join(dir,f))==True:
             dirs.append(f)
-    print dirs			
+    # print dirs			
     for img in dirs:
         tile_img=img[3:9]		
         year_img=img[9:13]
@@ -61,15 +61,17 @@ def getlandsats(years,tiles,admitedcloudcover,outputdir):
     for tile in tiles:
         for year, bird in years.iteritems():
             for season in seasonintervals:
+                # print season		#DEBUG	
                 if season=='0101-0630':
                     season_ext='Wet'
-                else:
-                    season_ext=='Dry'
+                elif season=='0701-0730':
+                    season_ext='Dry'
+                # print season_ext    #DEBUG
                 checkexists=checkseasonimg(year,season_ext,tile,outputdir)
-                print checkexists	
+                # print checkexists	
                 if checkexists!=None:
                     print "Bingo! There is already an image in the output directory with year, tile and season corresponding to what you're searching: "+checkexists+". Skiping.."
-                    downloaded.append(checkexists)
+                    downloaded.append(checkexists)					
                 else:
                     startdate=year+season.split('-')[0]
                     enddate=year+season.split('-')[1]
@@ -79,4 +81,4 @@ def getlandsats(years,tiles,admitedcloudcover,outputdir):
                     images=l.read().translate(None, '\n[]\'')
                     if images!='':		
                         downloaded=downloaded+images.split(',')
-    return downloaded		
+    return list(set(downloaded))		

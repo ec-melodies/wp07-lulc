@@ -33,7 +33,7 @@ admitedcloudcover = data.admitedcloudcover
 imagelist = data.imagelist
 if imagelist=='':
     imagelist=getlandsats(years,fetchtiles,admitedcloudcover,image_path)
-print imagelist   #DEBUG
+# print imagelist   #DEBUG
 output=data.output
 color_path= os.path.join(dirname(__file__),'symbology','data_lulc_trends_legend2d')
 reclass_path= os.path.join(dirname(__file__),'symbology','reclass_lucc')
