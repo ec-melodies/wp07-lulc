@@ -1,1 +1,1 @@
-1/subclass07 subclass07 cat $GISDBASE/$LOCATION_NAME/$MAPSET/dbf/ dbf
+1/subclass07wgs84 subclass07 cat $GISDBASE/$LOCATION_NAME/$MAPSET/dbf/ dbf
