@@ -153,12 +153,12 @@ def generalize_lulc(lulcmap,gen_lulcmap,mmu,skipmajfilter):
         temp2='temp2'	
         grass.run_command("r.neighbors",input=lulcmap, output=temp2, size='3', method='mode', overwrite=True)
         lulcmap=temp2		
-    if mmu>=0:
+    if mmu>0:
         if skipmajfilter==True:
             temp=gen_lulcmap
         else:			
             temp='temp'	
-        grass.run_command("r.reclass.area", input=lulcmap, output=temp, quiet = True, greater=mmu, overwrite=True)
+        grass.run_command("r.reclass.area", input=lulcmap, output=temp, greater=mmu, quiet=True, overwrite=True)
     else:
         temp=lulcmap
     if skipmajfilter==False:		

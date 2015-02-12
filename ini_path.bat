@@ -22,7 +22,7 @@ set OTB=%OSGEO4W_ROOT%\apps\orfeotoolbox\python
 set LIB=%pyfiles_ROOT%lib
 set EXTLIB=%pyfiles_ROOT%extlib
 set MSYS=%OSGEO4W_ROOT%\apps\msys\bin
-
+set GRASS_SH=%OSGEO4W_ROOT%\apps\msys\bin\sh.exe
 
 PATH=%LIB%;%EXTLIB%;%osgeo_python%;%osgeo_python_scripts%;%OSGEO4W%;%OSGEO4W_ETC%;%Landsat_LDOPE%;%Landsat_download%;%GRASSBIN%;%LD_LIBRARY_PATH%;%starspan%;%MSYS%
 set PYTHONPATH=%DWEISPYTHONLIBS%;%OTB%;%LIB%
