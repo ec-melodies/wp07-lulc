@@ -52,7 +52,7 @@ def getlandsats(years,tiles,admitedcloudcover,outputdir):
         admitedcloudcover=''
     else:
         admitedcloudcover=' -c '+admitedcloudcover
-    seasonintervals=['0101-0630','0701-0730']
+    seasonintervals=['0101-0630','0701-0930']
     landsat_download_home = os.environ['Landsat_download']
     passwfile = os.path.join(landsat_download_home,'usgs.txt')
 	# LandsatDownloadProgdir ='/home/melodies-wp7/LANDSAT-Download/'   #Unix
