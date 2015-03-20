@@ -67,7 +67,7 @@ def read_landsat_metadata(image_path,image_name):
         'RADIANCE_MAXIMUM_BAND_7',
         'RADIANCE_MINIMUM_BAND_7']
     sensor=[]
-    metadatafile= image_path.replace('"\"', '/') + image_name + '/'+ image_name + '_MTL.txt'
+    metadatafile= os.path.join(image_path,image_name,image_name + '_MTL.txt')
     metadata = open(metadatafile, 'r')
     # metadata.replace('\r','')	
     for line in metadata:
