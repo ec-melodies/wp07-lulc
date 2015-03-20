@@ -64,7 +64,7 @@ def getlandsats(years,tiles,admitedcloudcover,outputdir):
                 # print season		#DEBUG	
                 if season=='0101-0630':
                     season_ext='Wet'
-                elif season=='0701-0730':
+                elif season=='0701-0930':
                     season_ext='Dry'
                 # print season_ext    #DEBUG
                 checkexists=checkseasonimg(year,season_ext,tile,outputdir)
