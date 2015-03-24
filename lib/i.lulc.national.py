@@ -156,14 +156,18 @@ def main():
            grass.fatal(_("Unable to normalize NDVI map from image 1. Please review selected input files."))		        
     
     p=ndvi_normalizer(band_ndvi2, NDVItemp2, t_srx,proj_units)
-	# export NDVI from the dry season to tif
-    dryndvitif=os.path.join(platform,'GRASS_data',band_ndvi2.replace('@'+t_mapset,'')+'.tif')
-    grass.message("Converting NDVI from the dry season to tif: "+str(dryndvitif))		
-    grass.run_command("r.out.gdal", input=NDVItemp2, output=dryndvitif)	
     if p==-1:
             eliminate_rastermaps([NDVItemp1,NDVItemp2])		
             grass.fatal(_("Unable to normalize NDVI map from image 2. Please review selected input files."))		            
-
+	
+	# export NDVI from the dry season to tif
+    dryndvitif=os.path.join(platform,'GRASS_data',band_ndvi2.replace('@'+t_mapset,'')+'.tif')
+    try:
+        with open(dryndvitif) as f: pass
+    except:
+        grass.message("Converting NDVI from the dry season to tif: "+str(dryndvitif))	
+        grass.run_command("r.out.gdal", input=NDVItemp2, output=dryndvitif)				
+			
     #Substitute NDVIfiles in input
     input[band_ndvi1_idx]=NDVItemp1
     input[band_ndvi2_idx]=NDVItemp2
