@@ -76,7 +76,7 @@ def getlandsats(years,tiles,admitedcloudcover,outputdir):
                     startdate=year+season.split('-')[0]
                     enddate=year+season.split('-')[1]
                     print "Search interval: " + startdate + " to " +enddate + " - Bird: " + bird
-                    subprocess.call('download_landsat_scene.py -z unzip -b '+bird+' -o catallogue -d '+startdate+' -f '+enddate+admitedcloudcover+' -k noupdate -s '+tile+' -u '+passwfile+' --output '+outputdir, shell=True)
+                    subprocess.call('download_landsat_scene.py -z unzip -b '+bird+' -o catalog -d '+startdate+' -f '+enddate+admitedcloudcover+' -k noupdate -s '+tile+' -u '+passwfile+' --output '+outputdir, shell=True)
                     l = open(logfile,'r')
                     images=l.read().translate(None, '\n[]\'')
                     if images!='':		
