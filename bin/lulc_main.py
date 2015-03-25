@@ -271,7 +271,6 @@ for t in tiles:
                                         name_dry.replace('band','ndvi'), 
                                         name_dry.replace('band','band7')], 
                               output=output)
-            # print 'i.lulc ->'+str(p)    #DEBUG
             # append generated lulc's to a list which will be processed further			
             generatedlulc = get_lulc_files(mapset, data.output+t+"*_LULC")
             if p!=0 and output+'_LULC' not in generatedlulc:
@@ -279,18 +278,14 @@ for t in tiles:
         elif valid_seasons_imgs<2:
             grass.message(_("Two seasons must be available to generate LULC map for tile "+t+" and year "+y))      
         elif fu.get('fullname')!='':
-            generatedlulc = get_lulc_files(mapset, data.output+t+"*_LULC")
-            #grass.message(generatedlulc)   #DEBUG			
+            generatedlulc = get_lulc_files(mapset, data.output+t+"*_LULC")	
             grass.message(_("File already in mapset. Skipped generating LULC map for tile "+t+" and year "+y))
 
         #GENERALIZATION
         all_gens = grass.find_file(element = 'cell', name = output+'_LULC_gen@'+mapset)
         generatedlulc = get_lulc_files(mapset, data.output+t+"*_LULC")
-        #generatedgenlulc___ = get_lulc_files(mapset, data.output+t+"*_LULC_gen")		
-        #print "generatedgenlulc___: " + str(generatedgenlulc___)     #DEBUG
-        # grass.message("LULCs para generalizar " + str(generatedlulc))   #DEBUG			
         for lulcmap in generatedlulc:	
-            gen_lulcmap= lulcmap+'_gen'	
+            gen_lulcmap= lulcmap.strip()+'_gen'	
             #print all_gens.get(lulcmap)	
             if all_gens.get('fullname')=='':
                 try:			
@@ -300,14 +295,13 @@ for t in tiles:
                     grass.warning(_("Unable to generalize "+lulcmap))				
             else:
                 generatedgenlulc.append(gen_lulcmap)			
-        # grass.message(generatedgenlulc)   #DEBUG	
 		
     #SEGMENTATION AND INTEGRATION OF LULC  
     grass.message(_("Segmenting LULC raster map..."))           
     if len(generatedgenlulc)>=1:
         for lulcmap in generatedgenlulc:
             #EXPORT LULC MAP OUT OF GRASS
-            lulcmaptif=non_grass_outputpath+'/'+lulcmap+'.tif'
+            lulcmaptif=os.path.join(non_grass_outputpath,lulcmap+'.tif')
 		    # Define computational region
             try:	
                 grass.run_command("g.region", rast = lulcmap)	
@@ -333,7 +327,7 @@ for t in tiles:
                 try:
                     with open(mask) as f: pass
                 except:					
-                    print os.system('gdal_calc.py -A ' + lulcmaptif + ' --A_band 1 --outfile=' + mask + ' --calc="A>0" --overwrite') 
+                    subprocess.call('gdal_calc.py -A ' + lulcmaptif + ' --A_band 1 --outfile=' + mask + ' --calc="A>0" --overwrite', shell=True)
                 #perform segmentation GRASS 7
 #                 grass.run_command("i.segment", group='te', output='lixolcover_sgm', threshold='0.6', minsize=minsize)
                 #perform segmentation		
@@ -348,16 +342,18 @@ for t in tiles:
                     remove_shapefile(vect_out)
                     grass.run_command("v.out.ogr", input=lulcmap+'_segm', type='area', dsn=vect_out)				
                 except: 
-    				grass.message(_("Skipping cleaning segments..."))				
+    				grass.message(_("Skipping cleaning segments..."))	
+            summary_table=output_stats+'_summary.csv'
+            if os.path.exists(summary_table)==False and dataSource!=None:		
                 #integrate raster values in segments
                 grass.message(_("Integrating segments and raster LULC values..."))
                 #calculate areas and id for each segment				
                 calculateidandareas(vect_out)			
-                print os.system('starspan --vector '+vect_out +' --raster ' + lulcmaptif + ' --out-prefix ' +  output_stats + ' --out-type table --nodata 0 --skip_invalid_polys --elapsed_time --mask '+mask +' --summary-suffix _summary.csv --stats mode --fields ID --noColRow --noXY --RID none')			
-                integratesegmentationandraster (lulcmaptif,output_stats+'_summary.csv',vect_out)
+                subprocess.call('starspan --vector '+vect_out +' --raster ' + lulcmaptif + ' --out-prefix ' +  output_stats + ' --out-type table --nodata 0 --skip_invalid_polys --elapsed_time --mask '+mask +' --summary-suffix _summary.csv --stats mode --fields ID --noColRow --noXY --RID none', shell=True)
+                # integratesegmentationandraster (lulcmaptif,summary_table,vect_out)
                 #join
-                join_segments_and_csv(vect_out,output_stats+'_summary.csv')
-                print os.system('ogr2ogr -overwrite ' + vect_out + ' ' + vect_out.replace('.shp','_join.shp'))
+                join_segments_and_csv(vect_out,summary_table)
+                subprocess.call('ogr2ogr -overwrite ' + vect_out + ' ' + vect_out.replace('.shp','_join.shp'), shell=True)
                 remove_shapefile(vect_out.replace('.shp','_join.shp'))		
  
 #    CHECK FOR MORE THAN ONE LULC MAP AND GENERATE LULC CHANGES MAP      

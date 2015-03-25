@@ -121,7 +121,7 @@ def calculateidandareas(vector_file):
 	if ds is None:
 		print vector_file + " open failed./n"
 		sys.exit( 1 )
-	layername = vector_file[vector_file.rfind('/')+1:][:vector_file[vector_file.rfind('/')+1:].rfind('.')]
+	layername = basename(vector_file)[:-4]
 	lyr = ds.GetLayerByName( layername )
 	lyr.ResetReading()
 	layer_defn = lyr.GetLayerDefn()
