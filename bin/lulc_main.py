@@ -342,7 +342,8 @@ for t in tiles:
                     remove_shapefile(vect_out)
                     grass.run_command("v.out.ogr", input=lulcmap+'_segm', type='area', dsn=vect_out)				
                 except: 
-    				grass.message(_("Skipping cleaning segments..."))	
+    				grass.message(_("Skipping cleaning segments..."))
+                dataSource='exists'					
             summary_table=output_stats+'_summary.csv'
             if os.path.exists(summary_table)==False and dataSource!=None:		
                 #integrate raster values in segments
