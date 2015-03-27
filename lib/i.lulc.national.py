@@ -223,11 +223,12 @@ def main():
     grass.message(_("Applying outliers detection & elimination procedure over each available training area..."))	
     idx=0
     classes_t=[""]
+    classes_test=[""]	
     #grass.message(_("DEBUG3.5: " + str(classes)))	
     for x in classes:
        # Generate signature
        p=grass.run_command("i.gensig", group=group_name, subgroup="subgroup", trainingmap=x, signaturefile=x, overwrite=True, quiet=True)
-       grass.message(_("A processar classe: " + str(x)))	   
+       grass.message(_("Processing class: " + str(x)))	   
        if p!=0:
           eliminate_rastermaps([NDVItemp1,NDVItemp2,"mask_map__t"])	
           eliminate_rasterlists('*__t', t_mapset)    
@@ -279,8 +280,13 @@ def main():
 	# Print list of valid subclasses
     grass.message(_("The following subclasses will be used as Training areas\n"))
     for x in classes:
-       msg_subclass= "Sub_class ID: " + x[:-3]
-       grass.message(_(msg_subclass))	   
+        if x.find('_test')<0:  
+            msg_subclass= "Sub_class ID: " + x[:-3]
+            grass.message(_(msg_subclass))
+        else:
+            classes.remove(x)
+            classes_test.append(x)
+            		
     
     #Create trainingmap
     grass.message(_("Creating training map and signature file..."))
@@ -292,6 +298,11 @@ def main():
        grass.run_command("g.remove", group=group_name, flags="f", quiet=True)		  		   	     	   	   
        grass.fatal(_("GRASS was unable to create a training map for the indicated classes. Please retry or review selected input images."))
 
+    #Create testingmap
+    grass.message(_("Creating testing map to assess thematic accuracy..."))
+    p=grass.run_command("r.patch",input=classes_test, output="testmap", quiet=True, overwrite=True)	
+    eliminate_rastermaps(classes_test)	
+	   
     #Eliminate subclasses training raster maps
     eliminate_rastermaps(classes)
 	   
@@ -372,7 +383,13 @@ def main():
     p=grass.run_command("r.reclass", input=output_t,output=output_r,rules=reclass_path, overwrite=True)		
     if p!=0:
         eliminate_rastermaps([output_t])
-        grass.fatal(_("Not possible to reclassify National Scale map to DW-E 11 classes. Try again and if the problem persists, please reinstall DWE-IS."))	   			    
+        grass.fatal(_("Not possible to reclassify National Scale map to DW-E 11 classes. Try again and if the problem persists, please reinstall DWE-IS."))	
+
+    p=grass.run_command("r.reclass", input='testmap',output='testmap_11classes',rules=reclass_path, overwrite=True)
+    eliminate_rastermaps(['testmap'])	
+    if p!=0:
+        eliminate_rastermaps(['testmap_11classes'])
+        grass.fatal(_("Not possible to reclassify test samples map to DW-E 11 classes. Try again and if the problem persists, please reinstall DWE-IS."))	 		
 
     # Check if PERMANENT mapset exists
     # list_mapsets=grass.mapsets(True)[0].split("newline")	
@@ -476,7 +493,7 @@ def mask_training(classes,band,mask_raster,t_mapset):
        return -1		
   
     for x in classes:
-        classvalue=x[-2:]
+        classvalue=x[8:10]
         try:
             classvalue= int(classvalue)
         except ValueError:
@@ -624,16 +641,33 @@ def select_classes(mapset, location,classes_format):
                 p=grass.run_command("v.to.rast", input=x, output=x, use="val", value=value, overwrite=True, quiet=True)       
                 if p!=0:
                    grass.fatal(_("DWE-IS was not able to convert %s training area to raster map. Please review available training areas."),x)           		   
-		
+            #Subset for test sample
+            random_subset(x, x+'_test', '20%')		
             #Verify if it has any valid values
             check_valid= valid_class(x)	
             if check_valid==0:
               valid_classes=valid_classes + [x]
             else:
-              eliminate_rastermaps([x])			
- 
+              eliminate_rastermaps([x])		
+            check_valid= valid_class(x+'_test')	
+            if check_valid==0:
+              valid_classes=valid_classes + [x+'_test']
+            else:
+              eliminate_rastermaps([x+'_test'])	
+			  
     return valid_classes
 
+def random_subset(input, output_name, value):
+    output_temp= input + '_tempmask'
+    class_val=class_value(input)
+    p=grass.run_command("r.random", input=input, raster_output=output_name, n=value, overwrite=True, quiet=True)
+    if p!=0:
+        grass.fatal(_("DWE-IS was not able to randomly subset input map"))
+        return output_name
+    grass.mapcalc("$output_subclass= if(($subclass==$class_value & isnull($mask_band)),$class_value)", output_subclass=output_temp, class_value=class_val, subclass=input, mask_band=output_name)
+    eliminate_rastermaps(input)	
+    p=grass.run_command('g.rename', rast = (output_temp, input), quiet=True, overwrite=True)
+	
 def class_value(input):
 # # # # # Retrieve class INT value from subclass filename
     value=int(input[8:])

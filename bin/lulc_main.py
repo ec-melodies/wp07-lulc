@@ -294,7 +294,11 @@ for t in tiles:
                 except:
                     grass.warning(_("Unable to generalize "+lulcmap))				
             else:
-                generatedgenlulc.append(gen_lulcmap)			
+                generatedgenlulc.append(gen_lulcmap)
+				
+        #ACCURACY ASSESSMENT
+        errormatrix=os.path.join(non_grass_outputpath,lulcmap.strip()+'_errormatrix')				
+        p=grass.run_command("r.kappa", classification=gen_lulcmap, reference='testmap_11classes', output=errormatrix, overwrite=True)
 		
     #SEGMENTATION AND INTEGRATION OF LULC  
     grass.message(_("Segmenting LULC raster map..."))           
