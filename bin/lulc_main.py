@@ -162,7 +162,8 @@ def generalize_lulc(lulcmap,gen_lulcmap,mmu,skipmajfilter):
     else:
         temp=lulcmap
     if skipmajfilter==False:		
-        grass.run_command("r.neighbors",input=temp, output=gen_lulcmap, size='3', method='mode', overwrite=True)		
+        grass.run_command("r.neighbors",input=temp, output=gen_lulcmap, size='3', method='mode', overwrite=True)
+    return 0		
  
 def landsat8_QAmask(inputQAband):
     inputQAmask=inputQAband.replace("QA","mask")
@@ -231,9 +232,9 @@ for img in imagelist:
     output=data.output
  
 #CHECK FOR WET AND DRY SEASON AND GENERATE LANDCOVER MAP IF VALID
+generatedlulctifs=[]
 generatedlulc=[]
 generatedgenlulc=[]
-generatedlulctifs=[]
 cont=0
 for t in tiles:
     cont=cont+1
@@ -270,36 +271,43 @@ for t in tiles:
                                         name_dry.replace('band','band5'), 
                                         name_dry.replace('band','ndvi'), 
                                         name_dry.replace('band','band7')], 
-                              output=output)
+                              output=output)		  
             # append generated lulc's to a list which will be processed further			
-            generatedlulc = get_lulc_files(mapset, data.output+t+"*_LULC")
-            if p!=0 and output+'_LULC' not in generatedlulc:
+            generatedlulc = get_lulc_files(mapset, output+'_LULC')
+            if p!=0 and output+'_LULC' not in generatedlulc:	
                 generatedlulc.append(output+'_LULC')
         elif valid_seasons_imgs<2:
             grass.message(_("Two seasons must be available to generate LULC map for tile "+t+" and year "+y))      
         elif fu.get('fullname')!='':
-            generatedlulc = get_lulc_files(mapset, data.output+t+"*_LULC")	
+            generatedlulc = get_lulc_files(mapset, output+'_LULC')	
             grass.message(_("File already in mapset. Skipped generating LULC map for tile "+t+" and year "+y))
 
-        #GENERALIZATION
+        #GENERALIZATION and ACCURACY ASSESSMENT
         all_gens = grass.find_file(element = 'cell', name = output+'_LULC_gen@'+mapset)
-        generatedlulc = get_lulc_files(mapset, data.output+t+"*_LULC")
+        all_testmaps = grass.find_file(element = 'cell', name = output+'testmap@'+mapset)		
+        # generatedlulc = get_lulc_files(mapset, data.output+t+"*_LULC")
         for lulcmap in generatedlulc:	
-            gen_lulcmap= lulcmap.strip()+'_gen'	
+            gen_lulcmap= lulcmap.strip()+'_gen'
+            testmap=lulcmap+'testmap'
             #print all_gens.get(lulcmap)	
             if all_gens.get('fullname')=='':
                 try:			
-                    generalize_lulc(lulcmap,gen_lulcmap,int(MMU),False)
-                    generatedgenlulc.append(gen_lulcmap)
+                    g=generalize_lulc(lulcmap,gen_lulcmap,int(MMU),False)
                 except:
-                    grass.warning(_("Unable to generalize "+lulcmap))				
+                    grass.warning(_("Unable to generalize "+lulcmap))
+                    g=1
+                if g==0:
+                    generatedgenlulc.append(gen_lulcmap)
+                    generatedlulc.remove(lulcmap)			
             else:
                 generatedgenlulc.append(gen_lulcmap)
+            #ACCURACY ASSESSMENT	
+            errormatrix=os.path.join(non_grass_outputpath,gen_lulcmap.strip()+'_errormatrix')
+            try:			
+                p=grass.run_command("r.kappa", classification=gen_lulcmap, reference=testmap, output=errormatrix, overwrite=True)		
+            except:
+                grass.message("No testmap was found!")
 				
-        #ACCURACY ASSESSMENT
-        errormatrix=os.path.join(non_grass_outputpath,lulcmap.strip()+'_errormatrix')				
-        p=grass.run_command("r.kappa", classification=gen_lulcmap, reference='testmap_11classes', output=errormatrix, overwrite=True)
-		
     #SEGMENTATION AND INTEGRATION OF LULC  
     grass.message(_("Segmenting LULC raster map..."))           
     if len(generatedgenlulc)>=1:
@@ -361,7 +369,7 @@ for t in tiles:
                 subprocess.call('ogr2ogr -overwrite ' + vect_out + ' ' + vect_out.replace('.shp','_join.shp'), shell=True)
                 remove_shapefile(vect_out.replace('.shp','_join.shp'))		
  
-#    CHECK FOR MORE THAN ONE LULC MAP AND GENERATE LULC CHANGES MAP      
+   #CHECK FOR MORE THAN ONE LULC MAP AND GENERATE LULC CHANGES MAP      
     if len(generatedgenlulc)>=2:
 	    # Loop thru all lulc for current tile and select min and max year as start and end for the change detection
         start_lulc=''

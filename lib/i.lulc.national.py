@@ -71,6 +71,7 @@ def main():
     # Define output files
     output= output_pre + '_LULC' 
     output_label= output + 'label'
+    output_testmap= output + 'testmap'
 	
 	# Define temporary files
     pid= str(os.getpid())	
@@ -385,10 +386,9 @@ def main():
         eliminate_rastermaps([output_t])
         grass.fatal(_("Not possible to reclassify National Scale map to DW-E 11 classes. Try again and if the problem persists, please reinstall DWE-IS."))	
 
-    p=grass.run_command("r.reclass", input='testmap',output='testmap_11classes',rules=reclass_path, overwrite=True)
-    eliminate_rastermaps(['testmap'])	
+    p=grass.run_command("r.reclass", input='testmap',output=output_testmap,rules=reclass_path, overwrite=True)
     if p!=0:
-        eliminate_rastermaps(['testmap_11classes'])
+        eliminate_rastermaps([output_testmap])
         grass.fatal(_("Not possible to reclassify test samples map to DW-E 11 classes. Try again and if the problem persists, please reinstall DWE-IS."))	 		
 
     # Check if PERMANENT mapset exists
