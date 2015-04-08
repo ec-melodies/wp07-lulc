@@ -298,7 +298,15 @@ for t in tiles:
                     g=1
                 if g==0:
                     generatedgenlulc.append(gen_lulcmap)
-                    generatedlulc.remove(lulcmap)			
+                    generatedlulc.remove(lulcmap)
+                    lulcmaptif=os.path.join(non_grass_outputpath,gen_lulcmap+'.tif')
+					#EXPORT LULC MAP OUT OF GRASS
+                    #Check if tif already on disk
+                    try:
+                        with open(lulcmaptif) as f: pass
+                    except: 
+                        grass.run_command("r.out.gdal", input=lulcmap, output=lulcmaptif)
+                    generatedlulctifs.append(lulcmaptif)			
             else:
                 generatedgenlulc.append(gen_lulcmap)
             #ACCURACY ASSESSMENT	
@@ -311,20 +319,7 @@ for t in tiles:
     #SEGMENTATION AND INTEGRATION OF LULC  
     grass.message(_("Segmenting LULC raster map..."))           
     if len(generatedgenlulc)>=1:
-        for lulcmap in generatedgenlulc:
-            #EXPORT LULC MAP OUT OF GRASS
-            lulcmaptif=os.path.join(non_grass_outputpath,lulcmap+'.tif')
-		    # Define computational region
-            try:	
-                grass.run_command("g.region", rast = lulcmap)	
-            except:
-                grass.fatal(_("GRASS is not able to define a computational region for LULC process. Please review selected input images."))
-            #Check if tif already on disk
-            try:
-                with open(lulcmaptif) as f: pass
-            except: 
-                grass.run_command("r.out.gdal", input=lulcmap, output=lulcmaptif)
-            generatedlulctifs.append(lulcmaptif)				
+        for lulcmap in generatedgenlulc:	
             #Define variables for next steps
             vect_out=lulcmaptif.replace('.tif', '_segm.shp')
             mask=lulcmaptif.replace('.tif', '_mask.tif')
