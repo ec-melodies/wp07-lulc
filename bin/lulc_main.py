@@ -286,8 +286,9 @@ for t in tiles:
         all_gens = grass.find_file(element = 'cell', name = output+'_LULC_gen@'+mapset)
         all_testmaps = grass.find_file(element = 'cell', name = output+'testmap@'+mapset)		
         # generatedlulc = get_lulc_files(mapset, data.output+t+"*_LULC")
-        for lulcmap in generatedlulc:	
+        for lulcmap in generatedlulc:
             gen_lulcmap= lulcmap.strip()+'_gen'
+            lulcmaptif=os.path.join(non_grass_outputpath,gen_lulcmap+'.tif')			
             testmap=lulcmap+'testmap'
             #print all_gens.get(lulcmap)	
             if all_gens.get('fullname')=='':
@@ -298,23 +299,28 @@ for t in tiles:
                     g=1
                 if g==0:
                     generatedgenlulc.append(gen_lulcmap)
-                    generatedlulc.remove(lulcmap)
-                    lulcmaptif=os.path.join(non_grass_outputpath,gen_lulcmap+'.tif')
-					#EXPORT LULC MAP OUT OF GRASS
-                    #Check if tif already on disk
-                    try:
-                        with open(lulcmaptif) as f: pass
-                    except: 
-                        grass.run_command("r.out.gdal", input=lulcmap, output=lulcmaptif)
-                    generatedlulctifs.append(lulcmaptif)			
+                    generatedlulc.remove(lulcmap)	
             else:
                 generatedgenlulc.append(gen_lulcmap)
-            #ACCURACY ASSESSMENT	
-            errormatrix=os.path.join(non_grass_outputpath,gen_lulcmap.strip()+'_errormatrix')
-            try:			
-                p=grass.run_command("r.kappa", classification=gen_lulcmap, reference=testmap, output=errormatrix, overwrite=True)		
+		    #EXPORT LULC MAP OUT OF GRASS
+            # Define computational region
+            try:	
+                grass.run_command("g.region", rast = lulcmap)	
             except:
-                grass.message("No testmap was found!")
+                grass.fatal(_("GRASS is not able to define a computational region for LULC process. Please review selected input images."))			
+            #Check if tif already on disk				
+            try:
+                with open(lulcmaptif) as f: pass
+            except: 
+                grass.run_command("r.out.gdal", input=gen_lulcmap, output=lulcmaptif)
+            generatedlulctifs.append(lulcmaptif)
+            #ACCURACY ASSESSMENT			
+            errormatrix=os.path.join(non_grass_outputpath,gen_lulcmap.strip()+'_errormatrix')
+            if not os.path.isfile(errormatrix):
+                try:			
+                    p=grass.run_command("r.kappa", classification=gen_lulcmap, reference=testmap, output=errormatrix, overwrite=True)		
+                except:
+                    grass.message("No testmap was found!")
 				
     #SEGMENTATION AND INTEGRATION OF LULC  
     grass.message(_("Segmenting LULC raster map..."))           
