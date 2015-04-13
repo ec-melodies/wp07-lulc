@@ -17,12 +17,13 @@ Extlib=$HOME/wp07-lulc/extlib
 Landsat_download=$HOME/LANDSAT-Download
 Starspan=/usr/local/starspan/bin/
 basepath=/usr/lib64/qt-3.3/bin:/usr/local/bin:/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/sbin:
+ciop=/usr/lib/ciop/python/
  
 # define environment variables
 export GRASS_BATCH_JOB=$HOME/wp07-lulc/main.sh
 export Landsat_download=$Landsat_download
 export PATH=$basepath:$Lib:$Extlib:$Landsat_download:$Starspan:$Landsat_LDOPE
-export PYTHONPATH=$Lib
+export PYTHONPATH=$Lib:$ciop
 export LD_LIBRARY_PATH=/usr/local/lib/otb
 export GDAL_DATA=/application/gdal
  
