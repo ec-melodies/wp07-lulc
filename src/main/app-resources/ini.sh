@@ -11,7 +11,7 @@ chmod u+x $HOME/wp07-lulc/extlib/i.outdetect.exe
 chmod u+x $HOME/wp07-lulc/extlib/i.ldc.exe
 
 # define variables
-Landsat_LDOPE=/application/Landsat_LDOPE/linux64bit_bin
+Landsat_LDOPE=/opt/Landsat_LDOPE
 Lib=$HOME/wp07-lulc/lib
 Extlib=$HOME/wp07-lulc/extlib
 Landsat_download=$HOME/LANDSAT-Download
