@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<application xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" id="my_application">
+  <jobTemplates>
+    <jobTemplate id="my_template">
+      <streamingExecutable>/application/wp07-lulc/ini.sh</streamingExecutable>
+      <defaultParameters>
+        <parameter id="Years" title="Years" abstract="Set a list of the years you want to process Land Cover for." scope="runtime">['2013','2010','2000']</parameter>
+        <parameter id="Tiles" title="Tiles" abstract="Set a list of WRS2 tiles you want to process Land Cover for" scope="runtime">['180032']</parameter>
+        <parameter id="MMU" title="MMU" abstract="Set the Minimum Mapping Unit in hectares for your final Land Cover map" scope="runtime">5</parameter>
+      </defaultParameters>
+    </jobTemplate>
+  </jobTemplates>
+  <workflow id="LandUseLandCover" title="Land Use Land Cover workflow" abstract="LULC production">
+    <workflowVersion>1.0</workflowVersion>
+    <node id="my_node">
+      <job id="my_template" />
+      <sources>
+        <source refid="file:urls">/application/inputs/list</source>
+      </sources>
+      <parameters>
+        <parameter id="Years">['2013','2010','2000']</parameter>
+        <parameter id="Tiles">['180032']</parameter>
+        <parameter id="MMU">5</parameter>
+      </parameters>
+    </node>
+  </workflow>
+</application>
