@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>eu.melodiesproject</groupId>
+	<artifactId>wp07-lulc</artifactId>
+	<packaging>pom</packaging>
+	<name>wp07-lulc</name>
+	<description>WP07 Desertification Indicators - LULC</description>
+	<version>1.0-SNAPSHOT</version>
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.build.resourceEncoding>UTF-8</project.build.resourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+		<maven.deploy.skip>true</maven.deploy.skip>
+	</properties>
+
+	<repositories>
+		<repository>
+			<id>repository.terradue.com</id>
+			<name>repository.terradue.com-releases</name>
+			<url>http://repository.terradue.com/artifactory/libs-release-public</url>
+			<releases>
+				<checksumPolicy>warn</checksumPolicy>
+			</releases>
+		</repository>
+	</repositories>
+
+	<pluginRepositories>
+		<pluginRepository>
+			<snapshots />
+			<id>repository.terradue.com</id>
+			<name>repository.terradue.com-releases</name>
+			<url>http://repository.terradue.com/artifactory/libs-release-public</url>
+		</pluginRepository>
+	</pluginRepositories>
+
+	<build>
+		<plugins>
+
+			<plugin>
+				<artifactId>maven-clean-plugin</artifactId>
+				<version>2.5</version>
+				<configuration>
+					<filesets>
+						<fileset>
+							<directory>/application</directory>
+							<includes>
+								<include>**/*</include>
+							</includes>
+							<excludes>
+								<exclude>**/share/**</exclude>
+							</excludes>
+							<followSymlinks>false</followSymlinks>
+						</fileset>
+					</filesets>
+				</configuration>
+			</plugin>
+			
+			<plugin>
+				<artifactId>maven-resources-plugin</artifactId>
+				<version>2.6</version>
+				<executions>
+					<execution>
+						<id>copy-app-resources</id>
+						<phase>install</phase>
+						<goals>
+							<goal>copy-resources</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>/application</outputDirectory>
+							<resources>
+								<resource>
+									<directory>${basedir}/src/main/app-resources/</directory>
+								</resource>
+							</resources>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-antrun-plugin</artifactId>
+				<version>1.6</version>
+				<executions>
+					<execution>
+						<id>create target</id>
+						<phase>initialize</phase>
+						<configuration>
+							<target>
+								<mkdir dir="${project.build.directory}" />
+							</target>
+						</configuration>
+						<goals>
+							<goal>run</goal>
+						</goals>
+					</execution>
+
+					<execution>
+						<id>change perm</id>
+						<phase>install</phase>
+						<configuration>
+							<target>
+								<chmod dir="/application" includes="**/run, **/bin/*, **/*.py" perm="755" />
+							</target>
+						</configuration>
+						<goals>
+							<goal>run</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>exec-maven-plugin</artifactId>
+				<version>1.3.1</version>
+				<executions>
+					<execution>
+						<id>do package list</id>
+						<phase>prepare-package</phase>
+						<goals>
+							<goal>exec</goal>
+						</goals>
+						<configuration>
+							<executable>conda</executable>
+							<arguments>
+								<argument>list</argument>
+								<argument>-e</argument>
+							</arguments>
+							<outputFile>${project.build.directory}/package.list</outputFile>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>rpm-maven-plugin</artifactId>
+				<version>2.1.2</version>
+				<extensions>true</extensions>
+				<executions>
+					<execution>
+						<id>generate-rpm</id>
+							<goals>
+						<goal>rpm</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<copyright>${project.inceptionYear}, MELODIES, GPL</copyright>
+					<distribution>MELODIES ${project.inceptionYear}</distribution>
+					<group>eu.melodiesproject</group>
+					<packager></packager>
+					<name>${project.artifactId}</name>
+					<defaultDirmode>775</defaultDirmode>
+					<defaultFilemode>644</defaultFilemode>
+					<defaultUsername>root</defaultUsername>
+					<defaultGroupname>root</defaultGroupname>
+					<autoRequires>false</autoRequires>
+					<autoProvides>false</autoProvides>
+					<description>WP07 Desertification Indicators - LULC. http://www.melodiesproject.eu/</description>
+					<summary>WP07 Desertification Indicators - LULC</summary>
+					<executions>
+						
+						<execution>
+							<id>generate-rpm</id>
+							<goals>
+								<goal>rpm</goal>
+							</goals>
+						</execution>
+
+					</executions>
+					<mappings>
+						
+						<mapping>
+							<directory>/application</directory>
+							<sources>
+								<source>
+									<location>${basedir}/src/main/app-resources/</location>
+								</source>
+							</sources>
+						</mapping>
+
+						<mapping>
+							<directory>/application</directory>
+							<sources>
+								<source>
+									<location>${basedir}/src/main/app-resources</location>
+									<includes>
+										<include>**/run</include>
+										<include>**/bin*</include>
+										<include>**/*.py</include>
+									</includes>
+								</source>
+							</sources>
+							<filemode>755</filemode>
+						</mapping>
+					
+						<mapping>
+							<directory>/application/dependencies</directory>
+							<sources>
+								<source>
+									<location>${project.build.directory}/package.list</location>
+								</source>
+							</sources>
+						</mapping>
+					</mappings>
+					
+					<postinstallScriptlet>
+						<script>sudo conda install -y --file /application/dependencies/package.list</script>
+					</postinstallScriptlet>
+
+					<provides>
+						<provide>${project.artifactId}</provide>
+					</provides>
+					<requires>
+						<require>miniconda-3.8.3</require>
+					</requires>
+				</configuration>
+			</plugin>
+
+		</plugins>
+	</build>
+
+</project>
