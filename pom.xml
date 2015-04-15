@@ -136,7 +136,7 @@
 				</executions>
 			</plugin>
 
-			<plugin>
+			<!--<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>rpm-maven-plugin</artifactId>
 				<version>2.1.2</version>
@@ -207,11 +207,11 @@
 								</source>
 							</sources>
 						</mapping>
-					</mappings>
+					</mappings>-->
 					
-					<postinstallScriptlet>
-						<script>sudo conda install -y --file /application/dependencies/package.list</script>
-					</postinstallScriptlet>
+					<!--<postinstallScriptlet>
+						<script>sudo conda install -y --><!--file /application/dependencies/package.list</script>-->
+					<!--</postinstallScriptlet>
 
 					<provides>
 						<provide>${project.artifactId}</provide>
@@ -220,7 +220,7 @@
 						<require>miniconda-3.8.3</require>
 					</requires>
 				</configuration>
-			</plugin>
+			</plugin>-->
 
 		</plugins>
 	</build>
