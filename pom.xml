@@ -103,7 +103,7 @@
 						<phase>install</phase>
 						<configuration>
 							<target>
-								<chmod dir="/application" includes="**/run, **/bin/*, **/*.py" perm="755" />
+								<chmod dir="/application" includes="**/run, **/bin/*, **/*.py, **/*.sh, **/*.exe" perm="755" />
 							</target>
 						</configuration>
 						<goals>
