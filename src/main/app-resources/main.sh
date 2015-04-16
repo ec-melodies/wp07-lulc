@@ -1,5 +1,5 @@
-chmod u+x /home/melodies-wp7/wp07-lulc/bin/lulc_main.py
-python /home/melodies-wp7/wp07-lulc/bin/lulc_main.py
+chmod u+x /application/bin/lulc_main.py
+python /application/bin/lulc_main.py
 
 
 
