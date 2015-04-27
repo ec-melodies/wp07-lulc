@@ -179,8 +179,8 @@ def main():
         eliminate_rastermaps([NDVItemp1,NDVItemp2])	        
         grass.fatal(_("Unexpected error while creating a group for National Scale images. Please retry and if the error persists, reintall DWE-IS."))	
     # sig_path= source_GISDBASE + "\\" + source_location + "\\" +t_mapset + "\\" + "group" + "\\" + group_name + "\\" + "subgroup" + "\\" + "subgroup" + "\\" + "sig"    #Win32
-    sig_path= source_GISDBASE + "/" + source_location + "/" +t_mapset + "/" + "group" + "/" + group_name + "/" + "subgroup" + "/" + "subgroup" + "/" + "sig"     #UNIX
-
+    # sig_path= source_GISDBASE + "/" + source_location + "/" +t_mapset + "/" + "group" + "/" + group_name + "/" + "subgroup" + "/" + "subgroup" + "/" + "sig"     #UNIX
+    sig_path= os.path.join(source_GISDBASE, source_location, t_mapset, "group", group_name, "subgroup", "subgroup", "sig")
 	
     # Define computational region
     try:	
@@ -370,7 +370,8 @@ def main():
     grass.run_command("g.remove", group=group_name, flags="f", quiet=True)   
 
     #Apply Reclass
-    reclass_path= source_GISDBASE + "/" + source_location + "/" +t_mapset + "/" + ".tmp/reclass17classes"
+    # reclass_path= source_GISDBASE + "/" + source_location + "/" +t_mapset + "/" + ".tmp/reclass17classes"
+    reclass_path= os.path.join(source_GISDBASE, source_location, t_mapset,".tmp","reclass17classes")	
     p=write_reclassfile(reclass_path,classes)
     if p==-1:
         eliminate_rastermaps([output_t])
