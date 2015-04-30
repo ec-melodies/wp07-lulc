@@ -53,7 +53,7 @@ def main():
     if sys.platform.startswith('win'):	  #W32			
         platform =dirname(dirname(__file__))
     elif sys.platform.startswith('linux'):    #UNIX			
-        platform ='./wp07-lulc'
+        platform ='/application'
 		
     #Get projection units
     proj_units=get_projection_units()
@@ -178,8 +178,6 @@ def main():
     if p!=0:  
         eliminate_rastermaps([NDVItemp1,NDVItemp2])	        
         grass.fatal(_("Unexpected error while creating a group for National Scale images. Please retry and if the error persists, reintall DWE-IS."))	
-    # sig_path= source_GISDBASE + "\\" + source_location + "\\" +t_mapset + "\\" + "group" + "\\" + group_name + "\\" + "subgroup" + "\\" + "subgroup" + "\\" + "sig"    #Win32
-    # sig_path= source_GISDBASE + "/" + source_location + "/" +t_mapset + "/" + "group" + "/" + group_name + "/" + "subgroup" + "/" + "subgroup" + "/" + "sig"     #UNIX
     sig_path= os.path.join(source_GISDBASE, source_location, t_mapset, "group", group_name, "subgroup", "subgroup", "sig")
 	
     # Define computational region
@@ -193,7 +191,6 @@ def main():
 
     #Identify preliminary valid sub-Classes   
     classes= select_classes(t_mapset, source_location,"vector")
-    #grass.message(_("DEBUG1: " + str(classes)))
     if classes=='':
        eliminate_rastermaps([NDVItemp1,NDVItemp2])		
        eliminate_rasterlists('myscript.tmp*', t_mapset)    
@@ -202,7 +199,6 @@ def main():
 
     # Eliminate training values that have NULL values in raster maps    	    
     check_mask= mask_training(classes,input, mask_train,t_mapset)
-    #grass.message(_("DEBUG2: " + str(classes)))		
     if check_mask==-1:
        eliminate_rastermaps([NDVItemp1,NDVItemp2,"mask_map__t"])	
        eliminate_rasterlists('*__t', t_mapset)    
@@ -212,7 +208,6 @@ def main():
 
     # Create final list of existing classes
     classes= select_classes(t_mapset, source_location,"raster")
-    #grass.message(_("DEBUG3: " + str(classes)))		
     if classes=='':
        eliminate_rastermaps([NDVItemp1,NDVItemp2,"mask_map__t"])	
        eliminate_rasterlists('*__t', t_mapset)    
@@ -225,7 +220,6 @@ def main():
     idx=0
     classes_t=[""]
     classes_test=[""]	
-    #grass.message(_("DEBUG3.5: " + str(classes)))	
     for x in classes:
        # Generate signature
        p=grass.run_command("i.gensig", group=group_name, subgroup="subgroup", trainingmap=x, signaturefile=x, overwrite=True, quiet=True)
@@ -370,7 +364,6 @@ def main():
     grass.run_command("g.remove", group=group_name, flags="f", quiet=True)   
 
     #Apply Reclass
-    # reclass_path= source_GISDBASE + "/" + source_location + "/" +t_mapset + "/" + ".tmp/reclass17classes"
     reclass_path= os.path.join(source_GISDBASE, source_location, t_mapset,".tmp","reclass17classes")	
     p=write_reclassfile(reclass_path,classes)
     if p==-1:
@@ -665,7 +658,7 @@ def random_subset(input, output_name, value):
     if p!=0:
         grass.fatal(_("DWE-IS was not able to randomly subset input map"))
         return output_name
-    grass.mapcalc("$output_subclass= if(($subclass==$class_value & isnull($mask_band)),$class_value)", output_subclass=output_temp, class_value=class_val, subclass=input, mask_band=output_name)
+    grass.mapcalc("$output_subclass= if(($subclass==$class_value & isnull($mask_band)),$class_value,null())", output_subclass=output_temp, class_value=class_val, subclass=input, mask_band=output_name)
     eliminate_rastermaps(input)	
     p=grass.run_command('g.rename', rast = (output_temp, input), quiet=True, overwrite=True)
 	
