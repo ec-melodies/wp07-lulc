@@ -104,6 +104,7 @@
 						<configuration>
 							<target>
 								<chmod dir="/application" includes="**/run, **/bin/*, **/*.py, **/*.sh, **/*.exe" perm="755" />
+                <chmod file="/application/application.xml" perm="664"/>
 							</target>
 						</configuration>
 						<goals>
@@ -207,6 +208,18 @@
 								</source>
 							</sources>
 						</mapping>
+            <mapping>
+              <directory>/application</directory>
+              <sources>
+                <source>
+                  <location>${basedir}/src/main/app-resources</location>
+                  <includes>
+                    <include>application.xml</include>
+                  </includes>
+                </source>
+              </sources>
+              <filemode>664</filemode>
+            </mapping>
 					</mappings>-->
 					
 					<!--<postinstallScriptlet>
