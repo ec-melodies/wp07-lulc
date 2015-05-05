@@ -6,7 +6,8 @@ import grass.script.setup as gsetup
 import urllib
 from Gdalfunctions import *
 from otbfunctions import * 
-from getlandsat import * 
+from getlandsat import *
+from icloudfill import * 
 
 #get start time
 starttime=datetime.datetime.now()
@@ -230,6 +231,7 @@ for img in imagelist:
     if output_l[len(output_l)-1] not in tiles:
         tiles.append(output_l[len(output_l)-1])
     output=data.output
+	
  
 #CHECK FOR WET AND DRY SEASON AND GENERATE LANDCOVER MAP IF VALID
 generatedlulctifs=[]
@@ -256,6 +258,9 @@ for t in tiles:
                     valid_seasons_imgs=valid_seasons_imgs+1
         fu = grass.find_file(element = 'cell', name = output+'_LULC@'+mapset)
         if valid_seasons_imgs>=2 and fu.get('fullname')=='':
+            #CLOUD FILL
+            cloudfill(data.output,y,t)
+            #CLASSIFY
             p=grass.read_command("i.lulc.national.py", 
                               input1st=[name_wet.replace('band','band1'), 
                                         name_wet.replace('band','band2'), 
