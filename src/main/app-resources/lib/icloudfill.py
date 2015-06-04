@@ -6,6 +6,11 @@ import platform
 import grass.script as grass 
 
 def cloudfill(output_suf, year, tile):
+    #check if job was done before
+    if os.path.isfile(os.path.join('/application/logs/',year + "_" + output_suf +tile)): 
+        print "Skipping cloudfill processing in $s. Job was already done before!"%(year + "_" + output_suf +tile)
+        return
+
     #get all bands names
     output_wet= []
     for x in ['1','2','3','4','5','ndvi','7']:
@@ -42,4 +47,5 @@ def cloudfill(output_suf, year, tile):
             grass.run_command("g.remove", flags= 'f', rast = 'tempV', quiet=True)			
         except:
             grass.message('ERROR')			
-        			
+    
+    open(os.path.join('/application/logs/',year + "_" + output_suf +tile), 'a')
