@@ -15,6 +15,7 @@
 #############################################################################
 
 
+
 #%Module
 #%  description: Produces Land Use/Cover map for national scale based on LANDSAT images and defined training areas.
 #%  keywords: raster,national,lulc,landsat
@@ -386,18 +387,18 @@ def main():
         grass.fatal(_("Not possible to reclassify test samples map to DW-E 11 classes. Try again and if the problem persists, please reinstall DWE-IS."))	 		
 
     # Check if PERMANENT mapset exists
-    # list_mapsets=grass.mapsets(True)[0].split("newline")	
-    # if list_mapsets.__contains__('PERMANENT')==True:           
-       # check_input= grass.find_file('National', element = 'vector', mapset='PERMANENT')    	
-       # if check_input['fullname'] !="":
-          # no_region=False
-       # else:
-          # no_region=True
-    # else:
-    no_region=True			
+    list_mapsets=grass.mapsets(True)	
+    if list_mapsets.__contains__('PERMANENT')==True:        
+       check_input= grass.find_file('Land', element = 'vector', mapset='PERMANENT')    	
+       if check_input['fullname'] !="":
+          no_region=False
+       else:
+          no_region=True
+    else:
+       no_region=True			
     # Only produce map inside National boundaries.
     if no_region!=True:
-       p=grass.run_command("v.to.rast", input="National@PERMANENT", output=national_mask, use="val", value=1, overwrite=True, quiet=True)       
+       p=grass.run_command("v.to.rast", input="Land@PERMANENT", output=national_mask, use="val", value=1, overwrite=True, quiet=True)       
        try:	   	   
           grass.mapcalc("$output= if(($national>0), $input, null())", output=output, national=national_mask, input=output_r)
 		  

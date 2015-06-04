@@ -1,0 +1,8 @@
+COMMAND: v.in.ogr dsn="C:\Users\vbnunes\land.shp" output="Land" min_area=0.0001 snap=0.00001
+GISDBASE: C:\Users\vbnunes\Documents\projectos\ec_melodies\trunk\implementation\wp07-lulc\src\main\app-resources\GRASS_data
+LOCATION: World MAPSET: PERMANENT USER: vbnunes DATE: Wed Jun 03 14:42:34 2015
+-----------------------------------------------------
+458 input polygons
+Total area: 1.51879E+014 (1027 areas)
+Overlapping area: 0 (0 areas)
+Area without category: 8.76623E+011 (569 areas)
