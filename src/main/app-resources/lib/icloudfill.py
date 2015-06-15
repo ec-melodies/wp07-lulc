@@ -8,7 +8,7 @@ import grass.script as grass
 def cloudfill(output_suf, year, tile):
     #check if job was done before
     if os.path.isfile(os.path.join('/application/logs/',year + "_" + output_suf +tile)): 
-        print "Skipping cloudfill processing in $s. Job was already done before!"%(year + "_" + output_suf +tile)
+        print "Skipping cloudfill processing. Job was already done before!"
         return
 
     #get all bands names
