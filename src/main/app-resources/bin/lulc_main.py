@@ -178,6 +178,41 @@ def landsat8_QAmask(inputQAband):
 #Setup Grass GISbase, GISdbase, location and mapset
 gsetup.init(gisbase,
             gisdbase, location, mapset)
+			
+#ANALYSE imagelist AND REMOVE ALL IMAGES WITHOUT COMPLEMENTARY SEASON
+availableyears=[]
+availableseasons=[]
+availabletiles=[]
+for img in imagelist:
+    output_l=read_landsat_metadata(image_path,img)
+    year=output_l[0][0:4]
+    availableyears.append(year)
+    tile=output_l[len(output_l)-1]
+    availabletiles.append(tile)
+for img in imagelist:
+    output_l=read_landsat_metadata(image_path,img)
+    for t in list(set(availabletiles)):
+        tile=output_l[len(output_l)-1]
+        if tile==t:	
+            for y in list(set(availableyears)):
+                year=output_l[0][0:4]
+                if year==y:		
+                    season = Calculate_season(img,'Portugal')
+                    check=season + '-' + t+ '-' +  y				
+                    availableseasons.append(check)
+removeimgs=[]
+for img in imagelist:
+    output_l=read_landsat_metadata(image_path,img)
+    tile=output_l[len(output_l)-1]
+    year=output_l[0][0:4]    
+    if not ("Wet-"+tile+'-'+year in availableseasons and "Dry-"+tile+'-'+year in availableseasons):
+        removeimgs.append(img)
+if len(removeimgs)>0:
+    imagelist=list(set(imagelist).difference(removeimgs))
+    print 'Images '+str(removeimgs)+' will not be processed due to absence of complementary season'
+if len(imagelist)<2:
+    sys.exit("Two seasons must be available for each year and each image tile. Exiting...")
+					
 
 #IMPORT AND PRE-PROCESS LANDSAT IMAGES FROM imagelist
 imported=[]
