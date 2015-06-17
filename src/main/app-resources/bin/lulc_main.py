@@ -46,6 +46,7 @@ threshold = data.threshold
 minsize = data.minsize
 tilesize = data.tilesize
 simplify = data.simplify
+skiptrainningdataverif = data.skiptrainningdataverif
 non_grass_outputpath = data.non_grass_outputpath
 filelist=non_grass_outputpath + '/filelist.txt'
 
@@ -178,8 +179,10 @@ def landsat8_QAmask(inputQAband):
 #Setup Grass GISbase, GISdbase, location and mapset
 gsetup.init(gisbase,
             gisdbase, location, mapset)
-			
-#ANALYSE imagelist AND REMOVE ALL IMAGES WITHOUT COMPLEMENTARY SEASON
+
+#VALIDATE CRITICAL REQUIREMENTS BEFORE PROCEEDING
+#analyse imagelist and remove all images without complementary season
+grass.message('\nChecking existing season pairs for all selected tiles...\n\n')
 availableyears=[]
 availableseasons=[]
 availabletiles=[]
@@ -209,10 +212,58 @@ for img in imagelist:
         removeimgs.append(img)
 if len(removeimgs)>0:
     imagelist=list(set(imagelist).difference(removeimgs))
-    print 'Images '+str(removeimgs)+' will not be processed due to absence of complementary season'
+    grass.message('Images '+str(removeimgs)+' will not be processed due to absence of complementary season')
+else:
+    grass.message('OK')
 if len(imagelist)<2:
     sys.exit("Two seasons must be available for each year and each image tile. Exiting...")
-					
+
+#check that there are training sample data for all the images, if not remove images from imagelist
+if skiptrainningdataverif=='No':
+    grass.message('\nChecking existing training data for all selected tiles...\n\n')
+    tileiter=''
+    removeimgs=[]
+    all_classes=['subclass01','subclass02','subclass03','subclass04','subclass05','subclass06','subclass07','subclass08','subclass09','subclass10','subclass11','subclass12','subclass13','subclass14','subclass15','subclass16','subclass17']          
+    for img in imagelist:
+        tiletoremove=0
+        output_l=read_landsat_metadata(image_path,img)
+        tile=output_l[len(output_l)-1]
+        if not tile==tileiter:	
+            info=subprocess.Popen(["gdalinfo", os.path.join(image_path,img,img+'_B1.TIF')], stdout=subprocess.PIPE)
+            outp = info.stdout.read()
+            maxy= outp[outp.find('Upper Right')+57:outp.find('Lower Right')-2]
+            miny= outp[outp.find('Lower Left')+57:outp.find('Upper Right')-2]
+            minx= outp[outp.find('Lower Left')+42:outp.find('Upper Right')-17]
+            maxx= outp[outp.find('Upper Right')+42:outp.find('Lower Right')-17]	
+            minx= minx.replace('d',':').replace('\'',':').replace('"','').replace(' ','0')
+            miny= miny.replace('d',':').replace('\'',':').replace('"','').replace(' ','0')    
+            maxx= maxx.replace('d',':').replace('\'',':').replace('"','').replace(' ','0')    
+            maxy= maxy.replace('d',':').replace('\'',':').replace('"','').replace(' ','0')	
+            grass.run_command("g.region", n=maxy, e=maxx, s=miny, w=minx)
+            grass.run_command("v.in.region", output='region', overwrite=True, quiet=True)
+            featuresinregion=0
+            for trainingclass in all_classes:		
+                grass.run_command("v.select", ainput=trainingclass+'@National', binput='region@National', output='lixo', operator='overlap', quiet=True, flags='tc', overwrite=True)
+                selected=grass.read_command('v.info',map='lixo')		
+                featuresinregion = featuresinregion + int(selected[selected.find('Number of areas:')+16:selected.find('Number of lines:')-7].strip())
+                grass.run_command("g.remove", flags = "f", quiet=True, vect='lixo')
+            grass.message('Number of features within tile bounding box: ' + str(featuresinregion))		
+            if featuresinregion <1:
+                grass.message('Not possible to produce LULC National scale map. No training areas were found in tile '+tile+'. Skipping this tile...')
+                removeimgs.append(img)
+                tiletoremove=1
+            grass.run_command("g.remove", flags = "f", quiet=True, vect='region') 		
+            tileiter=tile
+        if tile==tileiter and tiletoremove==1:
+            removeimgs.append(img)
+
+    if len(set(removeimgs))>0:
+        imagelist=list(set(imagelist).difference(set(removeimgs)))
+        grass.message('Images '+str(list(set(removeimgs)))+' will not be processed due to absence training data')
+    else:
+        grass.message('OK')		
+    if len(imagelist)<2:
+        sys.exit("Two seasons must be available for each year and each image tile. Exiting...")
 
 #IMPORT AND PRE-PROCESS LANDSAT IMAGES FROM imagelist
 imported=[]
