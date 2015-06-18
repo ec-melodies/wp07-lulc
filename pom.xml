@@ -103,7 +103,7 @@
 						<phase>install</phase>
 						<configuration>
 							<target>
-								<chmod dir="/application" includes="**/run, **/bin/*, **/*.py, **/*.sh, **/*.exe" perm="755" />
+								<chmod dir="/application" includes="**/run, **/bin/*, **/*.py, **/*.sh, **/*.exe, **/GRASS_data/World/National/*" perm="755" />
                 						<chmod file="/application/application.xml" perm="664"/>
 							</target>
 						</configuration>
