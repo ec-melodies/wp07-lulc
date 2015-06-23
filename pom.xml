@@ -73,6 +73,9 @@
 							<resources>
 								<resource>
 									<directory>${basedir}/src/main/app-resources/</directory>
+									<excludes>
+										<exclude>**/GRASS_data/**</exclude>
+									</excludes>
 								</resource>
 							</resources>
 						</configuration>
@@ -103,7 +106,7 @@
 						<phase>install</phase>
 						<configuration>
 							<target>
-								<chmod dir="/application" includes="**/run, **/bin/*, **/*.py, **/*.sh, **/*.exe, **/GRASS_data/World/National/*" perm="755" />
+								<chmod dir="/application" includes="**/run, **/bin/*, **/*.py, **/*.sh, **/*.exe" perm="755" />
                 						<chmod file="/application/application.xml" perm="664"/>
 							</target>
 						</configuration>
@@ -137,7 +140,7 @@
 				</executions>
 			</plugin>
 
-			<!--<plugin>
+			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>rpm-maven-plugin</artifactId>
 				<version>2.1.2</version>
@@ -164,6 +167,9 @@
 					<autoProvides>false</autoProvides>
 					<description>WP07 Desertification Indicators - LULC. http://www.melodiesproject.eu/</description>
 					<summary>WP07 Desertification Indicators - LULC</summary>
+					<defineStatements>
+						<defineStatement>_unpackaged_files_terminate_build 0</defineStatement>
+					</defineStatements>
 					<executions>
 						
 						<execution>
@@ -181,6 +187,9 @@
 							<sources>
 								<source>
 									<location>${basedir}/src/main/app-resources/</location>
+									<excludes>
+										<exclude>**/GRASS_data/**</exclude>
+									</excludes>
 								</source>
 							</sources>
 						</mapping>
@@ -208,32 +217,34 @@
 								</source>
 							</sources>
 						</mapping>
-            <mapping>
-              <directory>/application</directory>
-              <sources>
-                <source>
-                  <location>${basedir}/src/main/app-resources</location>
-                  <includes>
-                    <include>application.xml</include>
-                  </includes>
-                </source>
-              </sources>
-              <filemode>664</filemode>
-            </mapping>
-					</mappings>-->
+            					<mapping>
+              						<directory>/application</directory>
+              						<sources>
+                						<source>
+                  							<location>${basedir}/src/main/app-resources</location>
+                  							<includes>
+                    								<include>application.xml</include>
+                  							</includes>
+                						</source>
+              						</sources>
+              						<filemode>664</filemode>
+            					</mapping>
+					</mappings>
 					
-					<!--<postinstallScriptlet>
-						<script>sudo conda install -y --><!--file /application/dependencies/package.list</script>-->
-					<!--</postinstallScriptlet>
+					<postinstallScriptlet>
+						<script>sudo conda install -y --file /application/dependencies/package.list</script>
+					</postinstallScriptlet>
 
 					<provides>
 						<provide>${project.artifactId}</provide>
 					</provides>
 					<requires>
 						<require>miniconda-3.8.3</require>
+						<require>landsat-download</require>
+						<require>landsat-ldope</require>
 					</requires>
 				</configuration>
-			</plugin>-->
+			</plugin>
 
 		</plugins>
 	</build>
