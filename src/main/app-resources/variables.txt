@@ -1,8 +1,8 @@
-gisbase = "/application"
-gisdbase = "/application/GRASS_data"
+gisbase = "/data"
+gisdbase = "/data/GRASS_data"
 location = "World"
 mapset   = "National"
-non_grass_outputpath='/application/GRASS_data'
+non_grass_outputpath='/data/GRASS_data'
 image_path='/home/melodies-wp7/images/'
 years={'2010':'LT5'}
 fetchtiles=['177035']
