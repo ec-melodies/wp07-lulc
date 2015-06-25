@@ -10,14 +10,14 @@ Bin=/application/bin
 Extlib=/application/extlib
 Landsat_download=$HOME/LANDSAT-Download
 Starspan=/usr/local/starspan/bin/
-basepath=/usr/lib64/qt-3.3/bin:/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/sbin:
-ciop=/usr/lib/ciop/python/
+# basepath=/usr/lib64/qt-3.3/bin:/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/sbin:
+anaconda=/opt/anaconda/bin/
  
 # define environment variables
 export GRASS_BATCH_JOB=/application/main.sh
 export Landsat_download=$Landsat_download
-export PATH=$basepath:$Bin:$Lib:$Extlib:$Landsat_download:$Starspan:$Landsat_LDOPE
-export PYTHONPATH=$Lib:$ciop
+export PATH=$anaconda:$Bin:$Lib:$Extlib:$Landsat_download:$Starspan:$Landsat_LDOPE:$PATH
+export PYTHONPATH=$Lib:$anaconda
 export LD_LIBRARY_PATH=/usr/local/lib/otb
 export GDAL_DATA=/application/gdal
  
