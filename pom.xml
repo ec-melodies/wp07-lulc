@@ -54,6 +54,12 @@
 							</excludes>
 							<followSymlinks>false</followSymlinks>
 						</fileset>
+						<fileset>
+							<directory>/data/GRASS_data</directory>
+							<includes>
+								<include>**/*</include>
+							</includes>
+						</fileset>
 					</filesets>
 				</configuration>
 			</plugin>
@@ -76,6 +82,24 @@
 									<excludes>
 										<exclude>**/GRASS_data/**</exclude>
 									</excludes>
+								</resource>
+							</resources>
+						</configuration>
+					</execution>
+					<execution>
+						<id>copy-data-resources</id>
+						<phase>install</phase>
+						<goals>
+							<goal>copy-resources</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>/data</outputDirectory>
+							<resources>
+								<resource>
+									<directory>${basedir}/src/main/app-resources/</directory>
+									<includes>
+										<include>**/GRASS_data/**</include>
+									</includes>
 								</resource>
 							</resources>
 						</configuration>
