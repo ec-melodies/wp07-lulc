@@ -55,6 +55,7 @@ def main():
         platform =dirname(dirname(__file__))
     elif sys.platform.startswith('linux'):    #UNIX			
         platform ='/application'
+        datadir = '/data'		
 		
     #Get projection units
     proj_units=get_projection_units()
@@ -163,7 +164,7 @@ def main():
             grass.fatal(_("Unable to normalize NDVI map from image 2. Please review selected input files."))		            
 	
 	# export NDVI from the dry season to tif
-    dryndvitif=os.path.join(platform,'GRASS_data',band_ndvi2.replace('@'+t_mapset,'')+'.tif')
+    dryndvitif=os.path.join(datadir,'GRASS_data',band_ndvi2.replace('@'+t_mapset,'')+'.tif')
     try:
         with open(dryndvitif) as f: pass
     except:
