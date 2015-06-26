@@ -150,7 +150,7 @@ def main():
     starttime=datetime.datetime.now()
     
     #READ VARIABLES
-    # ciop = cioppy.Cioppy()
+    ciop = cioppy.Cioppy()
     dirname=os.path.dirname
     appdir=os.path.abspath(os.path.join(os.path.dirname(__file__),".."))
     variablesfile= os.path.join(appdir,'variables.txt')
@@ -158,19 +158,25 @@ def main():
     gisbase = data.gisbase
     gisdbase = data.gisdbase
     location = data.location
-    fetchtiles = data.fetchtiles
+    #fetchtiles = data.fetchtiles
+    fetchtiles = ciop.getparam('tiles')
+    fetchtiles = fetchtiles .split(',')
     #handle years variable from ciop
-    years = data.years
-    # years = ciop.getparam('years')
-    # yearsdict = {}
-    # for y in years:
-        # if (2000<int(y)<=2003):
-            # yearsdict[y]='LE7'
-        # elif(2003<int(y)<2013):
-            # yearsdict[y]='LT5'
-        # elif(int(y)>=2013):
-            # yearsdict[y]='LC8'
-    # years=yearsdic
+    #years = data.years
+    years = ciop.getparam('years')
+    years = years.split(',')
+    yearsdict = {}
+    for y in years:
+        if (1999<=int(y)<=2003):
+            yearsdict[y]='LE7'
+        elif(2003<int(y)<2013):
+            yearsdict[y]='LT5'
+        elif(int(y)>=2013):
+            yearsdict[y]='LC8'
+        yearsdict.update(yearsdict)
+    years=yearsdict 
+    print years
+
     mapset   = data.mapset
     image_path=data.image_path
     admitedcloudcover = data.admitedcloudcover
@@ -181,8 +187,9 @@ def main():
     output=data.output
     color_path= os.path.join(dirname(__file__),'symbology','data_lulc_trends_legend2d')
     reclass_path= os.path.join(dirname(__file__),'symbology','reclass_lucc')
-    MMU = data.MMU
-    # MMU = ciop.getparam('MMU')
+    # MMU = data.MMU
+    MMU = ciop.getparam('MMU')
+    print " A MMU e: " + str(MMU)
     spatialr = data.spatialr
     maxiter = data.maxiter
     ranger = data.ranger
@@ -276,8 +283,9 @@ def main():
                 removeimgs.append(img)
     
         if len(set(removeimgs))>0:
-            imagelist=list(set(imagelist).difference(set(removeimgs)))
-            grass.message('Images '+str(list(set(removeimgs)))+' will not be processed due to absence training data')
+            #imagelist=list(set(imagelist).difference(set(removeimgs)))
+            imagelist=remove_duplicates(set(imagelist).difference(set(removeimgs)))
+            grass.message('Images '+str(remove_duplicates(set(removeimgs)))+' will not be processed due to absence training data')
         else:
             grass.message('OK')		
         if len(imagelist)<2:
@@ -533,9 +541,11 @@ def main():
     #calculate and print total processing time
     endtime=datetime.datetime.now()		
     print 'Total process duration = ' + str(endtime-starttime)
+	
+	return 1
 
 if __name__ == "__main__":
     try:
         main()
     except:		
-        print "Unexpected error:", sys.exc_info()[0]
+        print "Unexpected error:", sys.exc_info()[1]
