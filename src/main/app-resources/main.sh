@@ -1,6 +1,2 @@
-chmod u+x /application/bin/lulc_main.py
+#!/bin/sh
 python /application/bin/lulc_main.py
-
-
-
-
