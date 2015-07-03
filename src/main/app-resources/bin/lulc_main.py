@@ -158,11 +158,9 @@ def main():
     gisbase = data.gisbase
     gisdbase = data.gisdbase
     location = data.location
-    #fetchtiles = data.fetchtiles
     fetchtiles = ciop.getparam('tiles')
     fetchtiles = fetchtiles .split(',')
     #handle years variable from ciop
-    #years = data.years
     years = ciop.getparam('years')
     years = years.split(',')
     yearsdict = {}
@@ -175,8 +173,6 @@ def main():
             yearsdict[y]='LC8'
         yearsdict.update(yearsdict)
     years=yearsdict 
-    print years
-
     mapset   = data.mapset
     image_path=data.image_path
     admitedcloudcover = data.admitedcloudcover
@@ -187,9 +183,7 @@ def main():
     output=data.output
     color_path= os.path.join(dirname(__file__),'symbology','data_lulc_trends_legend2d')
     reclass_path= os.path.join(dirname(__file__),'symbology','reclass_lucc')
-    # MMU = data.MMU
     MMU = ciop.getparam('MMU')
-    print " A MMU e: " + str(MMU)
     spatialr = data.spatialr
     maxiter = data.maxiter
     ranger = data.ranger
@@ -199,6 +193,7 @@ def main():
     simplify = data.simplify
     skiptrainningdataverif = data.skiptrainningdataverif
     non_grass_outputpath = data.non_grass_outputpath
+    log_path=data.log_path
     filelist=non_grass_outputpath + '/filelist.txt'
  
     #Setup Grass GISbase, GISdbase, location and mapset
@@ -371,7 +366,7 @@ def main():
             fu = grass.find_file(element = 'cell', name = output+'_LULC@'+mapset)
             if valid_seasons_imgs>=2 and fu.get('fullname')=='':
                 #CLOUD FILL
-                cloudfill(data.output,y,t)
+                cloudfill(data.output,y,t,log_path)
                 #CLASSIFY
                 p=grass.read_command("i.lulc.national.py", 
                                   input1st=[name_wet.replace('band','band1'), 
