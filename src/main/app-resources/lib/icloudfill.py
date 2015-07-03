@@ -48,4 +48,4 @@ def cloudfill(output_suf, year, tile, logpath):
         except:
             grass.message('ERROR')			
     
-    open(os.path.join('/application/logs/',year + "_" + output_suf +tile), 'a')
+    open(os.path.join(logpath,year + "_" + output_suf +tile), 'a')
