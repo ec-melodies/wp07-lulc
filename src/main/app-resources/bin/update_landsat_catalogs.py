@@ -17,8 +17,14 @@
 import os, imp
 import subprocess
 
-landsat_download_home = os.environ['Landsat_download']
-passwfile = os.path.join(landsat_download_home,'usgs.txt')
+#READ VARIABLES
+dirname=os.path.dirname
+appdir=os.path.abspath(os.path.join(os.path.dirname(__file__),".."))
+variablesfile= os.path.join(appdir,'variables.txt')
+getVarFromFile(variablesfile)
+image_path=data.image_path
+credentialsfile = data.usgscredentialsfile
 
-subprocess.call('download_landsat_scene.py -z unzip -o catalog -d 20000101 -f 20000102 -k update -s 180031 -u '+passwfile+' --output c:\\', shell=True)
+
+subprocess.call('download_landsat_scene.py -z unzip -o catalog -d 20000101 -f 20000102 -k update -s 180031 -u '+credentialsfile+' --output c:\\ --outputcatalogs '+image_path, shell=True)
 	
