@@ -17,6 +17,13 @@
 import os, imp
 import subprocess
 
+def getVarFromFile(filename):
+    import imp
+    f = open(filename)
+    global data
+    data = imp.load_source('', '', f)
+    f.close()	
+
 #READ VARIABLES
 dirname=os.path.dirname
 appdir=os.path.abspath(os.path.join(os.path.dirname(__file__),".."))
@@ -26,5 +33,5 @@ image_path=data.image_path
 credentialsfile = data.usgscredentialsfile
 
 
-subprocess.call('download_landsat_scene.py -z unzip -o catalog -d 20000101 -f 20000102 -k update -s 180031 -u '+credentialsfile+' --output c:\\ --outputcatalogs '+image_path, shell=True)
+subprocess.call('download_landsat_scene.py -z unzip -o catalog -d 20000101 -f 20000102 -k update -s 180031 -u '+credentialsfile+' --output '+image_path+' --outputcatalogs '+image_path, shell=True)
 	
