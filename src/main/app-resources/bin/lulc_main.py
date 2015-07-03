@@ -232,7 +232,7 @@ def main():
         if not ("Wet-"+tile+'-'+year in availableseasons and "Dry-"+tile+'-'+year in availableseasons):
             removeimgs.append(img)
     if len(removeimgs)>0:
-        imagelist=list(set(imagelist).difference(removeimgs))
+        imagelist=remove_duplicates(set(imagelist).difference(removeimgs))
         grass.message('Images '+str(removeimgs)+' will not be processed due to absence of complementary season')
     else:
         grass.message('OK')
@@ -538,7 +538,7 @@ def main():
     endtime=datetime.datetime.now()		
     print 'Total process duration = ' + str(endtime-starttime)
 	
-	return 1
+    return 1
 
 if __name__ == "__main__":
     try:
