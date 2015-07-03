@@ -47,14 +47,12 @@ def checkseasonimg(year,season,tile,dir):
         return None
 
 
-def getlandsats(years,tiles,admitedcloudcover,outputdir,outputcatalogs):
+def getlandsats(years,tiles,admitedcloudcover,outputdir,outputcatalogs,credentialsfile):
     if admitedcloudcover==None:
         admitedcloudcover=''
     else:
         admitedcloudcover=' -c '+admitedcloudcover
     seasonintervals=['0101-0630','0701-0930']
-    landsat_download_home = os.environ['Landsat_download']
-    passwfile = os.path.join(landsat_download_home,'usgs.txt')
     logfile = os.path.join(outputdir,'log.txt')
     downloaded=[]
     for tile in tiles:
@@ -75,7 +73,7 @@ def getlandsats(years,tiles,admitedcloudcover,outputdir,outputcatalogs):
                     startdate=year+season.split('-')[0]
                     enddate=year+season.split('-')[1]
                     print "Search interval: " + startdate + " to " +enddate + " - Bird: " + bird
-                    subprocess.call('download_landsat_scene.py -z unzip -b '+bird+' -o catalog -d '+startdate+' -f '+enddate+admitedcloudcover+' -k noupdate -s '+tile+' -u '+passwfile+' --output '+outputdir+' --outputcatalogs '+outputcatalogs, shell=True)
+                    subprocess.call('download_landsat_scene.py -z unzip -b '+bird+' -o catalog -d '+startdate+' -f '+enddate+admitedcloudcover+' -k noupdate -s '+tile+' -u '+credentialsfile+' --output '+outputdir+' --outputcatalogs '+outputcatalogs, shell=True)
                     l = open(logfile,'r')
                     images=l.read().translate(None, '\n[]\'')
                     if images!='':		

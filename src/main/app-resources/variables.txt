@@ -5,6 +5,7 @@ mapset   = "National"
 non_grass_outputpath='/data/GRASS_data'
 image_path='/data/images/'
 log_path='/data/logs/'
+usgscredentialsfile='/data/usgs.txt'
 years={'2010':'LT5'}
 fetchtiles=['177035']
 imagelist=''
