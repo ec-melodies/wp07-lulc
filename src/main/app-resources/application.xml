@@ -8,19 +8,12 @@
         <parameter id="years" title="Years" abstract="Set the Years(s) you want to generate" scope="runtime">2000,2010</parameter>
         <parameter id="MMU" title="MMU" abstract="Set the Minimum Mapping Unit in hectares for your final Land Cover map" scope="runtime">5</parameter>
       </defaultParameters>
-      <defaultJobconf>
-        <property id="ciop.job.max.tasks">1</property>
-      </defaultJobconf>      
     </jobTemplate>
   </jobTemplates>
   <workflow id="LandUseLandCover" title="Land Use Land Cover workflow" abstract="LULC production">
     <workflowVersion>1.0</workflowVersion>
     <node id="my_node">
       <job id="my_template" />
-      <sources>
-        <source id="tiles" title="Tile(s)" abstract="List of tiles" refid="string:list" scope="runtime">tile1,tile2</source>
-        <source id="years" title="Year(s)" abstract="List of years" refid="string:list" scope="runtime">year1,year2</source>
-      </sources>
       <parameters>
         <parameter id="tiles">180032</parameter>
         <parameter id="years">2000,2010</parameter>
