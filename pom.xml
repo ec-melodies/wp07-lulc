@@ -54,12 +54,12 @@
 							</excludes>
 							<followSymlinks>false</followSymlinks>
 						</fileset>
-						<fileset>
+						<!--<fileset>
 							<directory>/data/GRASS_data</directory>
 							<includes>
 								<include>**/*</include>
 							</includes>
-						</fileset>
+						</fileset>-->
 					</filesets>
 				</configuration>
 			</plugin>
@@ -256,7 +256,8 @@
 					</mappings>
 					
 					<postinstallScriptlet>
-						<script>sudo conda install -y --file /application/dependencies/package.list</script>
+						<scriptFile>${basedir}/src/main/scripts/post_install.sh</scriptFile>
+						<fileEncoding>utf-8</fileEncoding>
 					</postinstallScriptlet>
 
 					<provides>
