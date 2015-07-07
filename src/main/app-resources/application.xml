@@ -14,10 +14,6 @@
     <workflowVersion>1.0</workflowVersion>
     <node id="my_node">
       <job id="my_template" />
-      <sources>
-        <source id="tiles" title="Tile(s)" abstract="List of tiles" refid="string:list" scope="runtime">tile1,tile2</source>
-        <source id="years" title="Year(s)" abstract="List of years" refid="string:list" scope="runtime">year1,year2</source>
-      </sources>
       <parameters>
         <parameter id="tiles">180032</parameter>
         <parameter id="years">2000,2010</parameter>
