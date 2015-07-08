@@ -426,6 +426,7 @@ def main():
                     with open(lulcmaptif) as f: pass
                 except: 
                     grass.run_command("r.out.gdal", input=gen_lulcmap, output=lulcmaptif)
+                    ciop.publish(lulcmaptif, metalink = True)					
                 generatedlulctifs.append(lulcmaptif)
                 #ACCURACY ASSESSMENT			
                 errormatrix=os.path.join(non_grass_outputpath,gen_lulcmap.strip()+'_errormatrix')
@@ -515,6 +516,7 @@ def main():
                     applycolormap(color_path, lulcchangesgen)
                     #export to tif			
                     grass.run_command("r.out.gdal", input=lulcchangesgen, output=lulcchangestif, type='Byte')
+                    ciop.publish(lulcchangestif, metalink = True)
                     #remove temp files
                     grass.run_command("g.remove", flags = "f", quiet=True, rast=lulcchanges)				
                     grass.run_command("g.remove", flags = "f", quiet=True, rast=temp)					
