@@ -266,6 +266,7 @@
 					<requires>
 						<require>miniconda-3.8.3</require>
 						<require>landsat-ldope</require>
+                                                <require>landsat-download</require>
 					</requires>
 				</configuration>
 			</plugin>
