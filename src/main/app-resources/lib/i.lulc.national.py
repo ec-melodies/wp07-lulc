@@ -176,7 +176,7 @@ def main():
     input[band_ndvi2_idx]=NDVItemp2
 
     #Create group and path to sig folder	
-    p=grass.run_command("i.group", group=group_name, subgroup="subgroup", input=input, quiet=True)
+    p=grass.run_command("i.group", group=group_name, subgroup="subgroup", input=input)
     if p!=0:  
         eliminate_rastermaps([NDVItemp1,NDVItemp2])	        
         grass.fatal(_("Unexpected error while creating a group for National Scale images. Please retry and if the error persists, reintall DWE-IS."))	
@@ -224,7 +224,7 @@ def main():
     classes_test=[""]	
     for x in classes:
        # Generate signature
-       p=grass.run_command("i.gensig", group=group_name, subgroup="subgroup", trainingmap=x, signaturefile=x, overwrite=True, quiet=True)
+       p=grass.run_command("i.gensig", group=group_name, subgroup="subgroup", trainingmap=x, signaturefile=x, overwrite=True)
        grass.message(_("Processing class: " + str(x)))	   
        if p!=0:
           eliminate_rastermaps([NDVItemp1,NDVItemp2,"mask_map__t"])	
@@ -634,7 +634,7 @@ def select_classes(mapset, location,classes_format):
                 # Retrieve raster final raster value				
                 value=class_value(x)   
                 #Convert training areas (vector to raster)			
-                p=grass.run_command("v.to.rast", input=x, output=x, use="val", value=value, overwrite=True, quiet=True)       
+                p=grass.run_command("v.to.rast", input=x, output=x, use="val", value=value, overwrite=True)       
                 if p!=0:
                    grass.fatal(_("DWE-IS was not able to convert %s training area to raster map. Please review available training areas."),x)           		   
             #Subset for test sample
