@@ -161,12 +161,12 @@ def read_wps_form(param):
                 yearsdict[y]='LC8'
             yearsdict.update(yearsdict)
         years=yearsdict 
-	return years
+	    return years
     elif param=='tiles':
     #handle tiles variable from ciop
         tiles = ciop.getparam('tiles')
         tiles = tiles.split(',')
-	return tiles
+	    return tiles
 
 def main():
     #get start time
