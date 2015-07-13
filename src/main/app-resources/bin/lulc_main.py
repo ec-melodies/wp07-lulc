@@ -144,7 +144,30 @@ def getVarFromFile(filename):
 
 def remove_duplicates(l):
     return list(set(l))
-	
+
+def read_wps_form(param):
+    ciop = cioppy.Cioppy()
+    if param=='years':
+    #handle years variable from ciop
+        years = ciop.getparam('years')
+        years = years.split(',')
+        yearsdict = {}
+        for y in years:
+            if (1999<=int(y)<=2003):
+                yearsdict[y]='LE7'
+            elif(2003<int(y)<2013):
+                yearsdict[y]='LT5'
+            elif(int(y)>=2013):
+                yearsdict[y]='LC8'
+            yearsdict.update(yearsdict)
+        years=yearsdict 
+	return years
+    elif param=='tiles':
+    #handle tiles variable from ciop
+        tiles = ciop.getparam('tiles')
+        tiles = tiles.split(',')
+	return tiles
+
 def main():
     #get start time
     starttime=datetime.datetime.now()
@@ -158,21 +181,8 @@ def main():
     gisbase = data.gisbase
     gisdbase = data.gisdbase
     location = data.location
-    fetchtiles = ciop.getparam('tiles')
-    fetchtiles = fetchtiles .split(',')
-    #handle years variable from ciop
-    years = ciop.getparam('years')
-    years = years.split(',')
-    yearsdict = {}
-    for y in years:
-        if (1999<=int(y)<=2003):
-            yearsdict[y]='LE7'
-        elif(2003<int(y)<2013):
-            yearsdict[y]='LT5'
-        elif(int(y)>=2013):
-            yearsdict[y]='LC8'
-        yearsdict.update(yearsdict)
-    years=yearsdict 
+    fetchtiles = read_wps_form('tiles')
+    years = read_wps_form('years')
     mapset   = data.mapset
     image_path=data.image_path
     admitedcloudcover = data.admitedcloudcover
