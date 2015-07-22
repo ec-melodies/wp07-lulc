@@ -521,7 +521,7 @@ def main():
               
       
     #Normalize Reflectances
-#     ndvi_out= str(year) + "_ndvi_" + output_suf + "_" + season 
+    ndvi_out= str(year) + "_ndvi_" + output_suf + "_" + season 
     try:    
        grass.message(_("Normalizing reflectances..."))            
        p=normalize_reflectances(output_t,output, landsatsensor)     

@@ -65,6 +65,9 @@ def image_bands(image_path,image_name,sensortype):
             band= image_path.replace('/', urllib.quote('/')) + image_name + urllib.quote('/')+ image_name + '_B'+str(b)+'.TIF'
             output_band_list.append(band)			
     return output_band_list
+
+def remove_existing_grassfiles(grassfilename):
+    grass.run_command("g.remove", rast=grassfilename, flags='f')
  
 def get_lulc_files(mapset, pattern):
     fu = grass.read_command("g.mlist", type = 'rast', mapset = mapset, pattern=pattern)
@@ -161,12 +164,12 @@ def read_wps_form(param):
                 yearsdict[y]='LC8'
             yearsdict.update(yearsdict)
         years=yearsdict 
-	    return years
+	return years
     elif param=='tiles':
     #handle tiles variable from ciop
         tiles = ciop.getparam('tiles')
         tiles = tiles.split(',')
-	    return tiles
+	return tiles
 
 def main():
     #get start time
@@ -201,6 +204,7 @@ def main():
     threshold = data.threshold
     minsize = data.minsize
     tilesize = data.tilesize
+    replace = data.replace
     simplify = data.simplify
     skiptrainningdataverif = data.skiptrainningdataverif
     non_grass_outputpath = data.non_grass_outputpath
@@ -313,7 +317,7 @@ def main():
         print output_band_list[0]
         name_in_grass=output_l[0][0:4]+'_band_'+output+'_'+season+'@'+mapset
         fu = grass.find_file(element = 'cell', name = name_in_grass.replace('band','band2'))
-        if fu.get('fullname')=='':
+        if fu.get('fullname')=='' or replace=='yes':
             grass.run_command("r.in.landsat.new.py", 
                               year=output_l[0][0:4], 
                               month=output_l[0][5:7], 
@@ -343,6 +347,8 @@ def main():
                               Lmaxb7=output_l[14], 
                               output=output, 
                               season=season)
+        else:
+            print ('Image already in mapset. Skipping import to GRASS...')     
         imported.append(name_in_grass)
         if output_l[0][0:4] not in yearofimportedimgs:
             yearofimportedimgs.append(output_l[0][0:4])
@@ -361,6 +367,8 @@ def main():
         grass.message("Processing image " + str(cont) + " out of " + str(len(tiles)))
         for y in yearofimportedimgs:
             output=data.output+t+'_'+y
+            if replace=='yes':
+                remove_existing_grassfiles(output+'_LULC@'+mapset)
             # print imported    #DEBUG
             valid_seasons_imgs=0
             name_dry = None
@@ -432,11 +440,8 @@ def main():
                 except:
                     grass.fatal(_("GRASS is not able to define a computational region for LULC process. Please review selected input images."))			
                 #Check if tif already on disk				
-                try:
-                    with open(lulcmaptif) as f: pass
-                except: 
-                    grass.run_command("r.out.gdal", input=gen_lulcmap, output=lulcmaptif)
-                    ciop.publish(lulcmaptif, metalink = True)					
+                grass.run_command("r.out.gdal", input=gen_lulcmap, output=lulcmaptif, overwrite=True)
+                ciop.publish(lulcmaptif, metalink = True)					
                 generatedlulctifs.append(lulcmaptif)
                 #ACCURACY ASSESSMENT			
                 errormatrix=os.path.join(non_grass_outputpath,gen_lulcmap.strip()+'_errormatrix')
