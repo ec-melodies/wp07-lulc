@@ -128,7 +128,7 @@ def main():
        if check_input['fullname'] =="":           
            grass.fatal(_("Raster " + x + " not available in National mapset. Please review selected input files."))        
 
-    #grass.message("o input e: " + str(input))
+    #grass.message("o input e: " + str(input))   #DEGUB
 		   
     #Eliminate group of images (if exists)	
     group_name= "lulc_national"
@@ -176,13 +176,14 @@ def main():
     input[band_ndvi2_idx]=NDVItemp2
 
     #Create group and path to sig folder	
-    p=grass.run_command("i.group", group=group_name, subgroup="subgroup", input=input)
+    p=grass.run_command("i.group", group=group_name, subgroup="subgroup", input=input, quiet=True)
     if p!=0:  
         eliminate_rastermaps([NDVItemp1,NDVItemp2])	        
         grass.fatal(_("Unexpected error while creating a group for National Scale images. Please retry and if the error persists, reintall DWE-IS."))	
     sig_path= os.path.join(source_GISDBASE, source_location, t_mapset, "group", group_name, "subgroup", "subgroup", "sig")
 	
     # Define computational region
+    grass.message("Setting computational region...")	
     try:	
         if proj_units=="meters":		
             grass.run_command("g.region", rast = input, res= t_srx)
@@ -230,8 +231,7 @@ def main():
           eliminate_rastermaps([NDVItemp1,NDVItemp2,"mask_map__t"])	
           eliminate_rasterlists('*__t', t_mapset)    
           eliminate_rasterlists('myscript.tmp*', t_mapset)    	   
-          grass.run_command("g.remove", group=group_name, flags="f", quiet=True)
-          # grass.message(_("DWE-IS was not able to calculate Training areas statistics for " + x + ". Please review selected input files and available subclasses." ))	  #DEBUG      	   		  
+          grass.run_command("g.remove", group=group_name, flags="f", quiet=True) 
           grass.fatal(_("DWE-IS was not able to calculate Training areas statistics for " + x + ". Please review selected input files and available subclasses." ))	        	   
 		   
        #Verify if signature is valid
@@ -627,7 +627,6 @@ def select_classes(mapset, location,classes_format):
     valid_classes=[]
     for x in all_classes:        
         #Verify if exists in current mapset/location
-        #grass.message("A verificar se a classe " + str(x) + " existe no mapset: " + str(mapset) + " e na location: " + str(location)) 		#DEBUG
         check_input= grass.find_file(x, element = element_id, mapset=mapset)    		
         if check_input['fullname'] !="":    
             if classes_format=='vector':
@@ -649,8 +648,7 @@ def select_classes(mapset, location,classes_format):
             if check_valid==0:
               valid_classes=valid_classes + [x+'_test']
             else:
-              eliminate_rastermaps([x+'_test'])	
-			  
+              eliminate_rastermaps([x+'_test'])			  
     return valid_classes
 
 def random_subset(input, output_name, value):
@@ -673,16 +671,14 @@ def class_value(input):
 def valid_class(input):
     #0  =has valid values
     #-1 =doesn't have any valid values
-    #grass.message(_("DEBUG8: output " + str(input)))
     univar_output=grass.read_command("r.univar", map=input, flags="g")
     if 	univar_output=="":
       return -1
     else:	  
-        #grass.message(_("DEBUG8.1: output " + str(univar_output)))
         univar_output=univar_output.split('\n')
         nullvalues= int((univar_output[1].split('='))[1])    
-        nvalues= int((univar_output[2].split('='))[1])    
-        if nvalues==nullvalues:
+        nvalues= int((univar_output[2].split('='))[1]) 
+        if nvalues-nullvalues<10:
           return -1
         else:
           return 0
