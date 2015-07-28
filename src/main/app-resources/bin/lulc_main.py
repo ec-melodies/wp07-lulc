@@ -81,7 +81,7 @@ def get_lulc_files(mapset, pattern):
             filename=''
     return lulcfiles           
  
-def applycolormap(color_path, output):       
+def applycolormap(color_path, output, gisbase):       
     # Apply Color map to LULC raster map    
     if not gisbase:
         grass.warning(_('For some reason DWE-IS and GRASS is not being able to find DWE-IS folder so it is not able to apply DWE color table. Try again and if the problem persists, please reinstall DWE-IS.'))
@@ -195,8 +195,8 @@ def main():
         imagelist=getlandsats(years,fetchtiles,admitedcloudcover,image_path,image_path,credentialsfile)
     # print imagelist   #DEBUG
     output=data.output
-    color_path= os.path.join(dirname(__file__),'symbology','data_lulc_trends_legend2d')
-    reclass_path= os.path.join(dirname(__file__),'symbology','reclass_lucc')
+    color_path= os.path.join(dirname(dirname(__file__)),'symbology','data_lulc_trends_legend2d')
+    reclass_path= os.path.join(dirname(dirname(__file__)),'symbology','reclass_lucc')
     MMU = ciop.getparam('MMU')
     spatialr = data.spatialr
     maxiter = data.maxiter
@@ -528,7 +528,7 @@ def main():
 				    #generalize LUCC
                     generalize_lulc(lulcchangesreclass,lulcchangesgen,int(MMU),True)	
                     #apply color map			
-                    applycolormap(color_path, lulcchangesgen)
+                    applycolormap(color_path, lulcchangesgen, gisbase)
                     #export to tif			
                     grass.run_command("r.out.gdal", input=lulcchangesgen, output=lulcchangestif, type='Byte')
                     ciop.publish(lulcchangestif, metalink = True)
