@@ -10,6 +10,17 @@ from otbfunctions import *
 from getlandsat import *
 from icloudfill import * 
 
+def set_region(layer,proj_units,t_srx):
+    # Define computational region
+    grass.message("Setting computational region...")	
+    try:	
+        if proj_units=="meters":		
+            grass.run_command("g.region", rast = layer, res= t_srx)
+        else:
+            grass.run_command("g.region", rast = layer)	
+    except:
+        grass.fatal(_("GRASS is not able to define a computational region for LULC process. Please review selected input images."))
+
 def read_landsat_metadata(image_path,image_name):
     output_list=[]
     fields = ['DATE_ACQUIRED',
@@ -386,6 +397,8 @@ def main():
             if valid_seasons_imgs>=2 and fu.get('fullname')=='':
                 #CLOUD FILL
                 cloudfill(data.output,y,t,log_path)
+                #SET REGION
+                set_region(name_wet.replace('band','band1'),'meters','30')				
                 #CLASSIFY
                 p=grass.read_command("i.lulc.national.py", 
                                   input1st=[name_wet.replace('band','band1'), 

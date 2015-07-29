@@ -182,8 +182,8 @@ def main():
         grass.fatal(_("Unexpected error while creating a group for National Scale images. Please retry and if the error persists, reintall DWE-IS."))	
     sig_path= os.path.join(source_GISDBASE, source_location, t_mapset, "group", group_name, "subgroup", "subgroup", "sig")
 	
-    # Define computational region
-    grass.message("Setting computational region...")	
+    # # Define computational region
+    # grass.message("Setting computational region...")	
     try:	
         if proj_units=="meters":		
             grass.run_command("g.region", rast = input, res= t_srx)
@@ -633,7 +633,7 @@ def select_classes(mapset, location,classes_format):
                 # Retrieve raster final raster value				
                 value=class_value(x)   
                 #Convert training areas (vector to raster)			
-                p=grass.run_command("v.to.rast", input=x, output=x, use="val", value=value, overwrite=True)       
+                p=grass.run_command("v.to.rast", input=x, output=x, use="val", value=value, overwrite=True, quiet=True)       
                 if p!=0:
                    grass.fatal(_("DWE-IS was not able to convert %s training area to raster map. Please review available training areas."),x)           		   
             #Subset for test sample
