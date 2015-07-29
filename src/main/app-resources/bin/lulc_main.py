@@ -220,6 +220,7 @@ def main():
     skiptrainningdataverif = data.skiptrainningdataverif
     non_grass_outputpath = data.non_grass_outputpath
     log_path=data.log_path
+    perform_segmentation=data.perform_segmentation
     filelist=non_grass_outputpath + '/filelist.txt'
  
     #Setup Grass GISbase, GISdbase, location and mapset
@@ -464,54 +465,55 @@ def main():
                     except:
                         grass.message("No testmap was found!")
 				    
-        #SEGMENTATION AND INTEGRATION OF LULC  
-        grass.message(_("Segmenting LULC raster map..."))           
-        if len(generatedgenlulc)>=1:
-            for lulcmap in generatedgenlulc:	
-                #Define variables for next steps
-                vect_out=lulcmaptif.replace('.tif', '_segm.shp')
-                mask=lulcmaptif.replace('.tif', '_mask.tif')
-                output_stats=lulcmaptif.replace('.tif', '_sts')
-                driver = ogr.GetDriverByName('ESRI Shapefile')
-                dataSource = driver.Open(vect_out, 0)	
-                #Segmentation			
-                if dataSource!=None:
-                    grass.message(_("Segmented map already exists. Skipping the segmentation process..."))
-                else:   
-                    #create a mask
-                    try:
-                        with open(mask) as f: pass
-                    except:					
-                        subprocess.call('gdal_calc.py -A ' + lulcmaptif + ' --A_band 1 --outfile=' + mask + ' --calc="A>0" --overwrite', shell=True)
-                    #perform segmentation GRASS 7
-    #                 grass.run_command("i.segment", group='te', output='lixolcover_sgm', threshold='0.6', minsize=minsize)
-                    #perform segmentation		
-                    s=otbsegmentation(lulcmaptif,mask,spatialr,maxiter,ranger,threshold,minsize,tilesize,simplify,vect_out)
-    			    #clean vector in grass
-                    grass.message(_("Cleaning segments in GRASS..."))
-                    checksegm = grass.find_file(element = 'vector', name = lulcmap+'_segm')
-                    if checksegm.get('fullname')=='':
-                          grass.run_command("v.in.ogr", dsn=vect_out, output=lulcmap+'_segm', snap='0.0002')
-                    try:
-                        with open(vect_out) as f: pass
-                        remove_shapefile(vect_out)
-                        grass.run_command("v.out.ogr", input=lulcmap+'_segm', type='area', dsn=vect_out)				
-                    except: 
-        				grass.message(_("Skipping cleaning segments..."))
-                    dataSource='exists'					
-                summary_table=output_stats+'_summary.csv'
-                if os.path.exists(summary_table)==False and dataSource!=None:		
-                    #integrate raster values in segments
-                    grass.message(_("Integrating segments and raster LULC values..."))
-                    #calculate areas and id for each segment				
-                    calculateidandareas(vect_out)			
-                    subprocess.call('starspan --vector '+vect_out +' --raster ' + lulcmaptif + ' --out-prefix ' +  output_stats + ' --out-type table --nodata 0 --skip_invalid_polys --elapsed_time --mask '+mask +' --summary-suffix _summary.csv --stats mode --fields ID --noColRow --noXY --RID none', shell=True)
-                    # integratesegmentationandraster (lulcmaptif,summary_table,vect_out)
-                    #join
-                    join_segments_and_csv(vect_out,summary_table)
-                    subprocess.call('ogr2ogr -overwrite ' + vect_out + ' ' + vect_out.replace('.shp','_join.shp'), shell=True)
-                    remove_shapefile(vect_out.replace('.shp','_join.shp'))		
-         
+        #SEGMENTATION AND INTEGRATION OF LULC
+        if perform_segmentation=="yes":		
+            grass.message(_("Segmenting LULC raster map..."))           
+            if len(generatedgenlulc)>=1:
+                for lulcmap in generatedgenlulc:	
+                    #Define variables for next steps
+                    vect_out=lulcmaptif.replace('.tif', '_segm.shp')
+                    mask=lulcmaptif.replace('.tif', '_mask.tif')
+                    output_stats=lulcmaptif.replace('.tif', '_sts')
+                    driver = ogr.GetDriverByName('ESRI Shapefile')
+                    dataSource = driver.Open(vect_out, 0)	
+                    #Segmentation			
+                    if dataSource!=None:
+                        grass.message(_("Segmented map already exists. Skipping the segmentation process..."))
+                    else:   
+                        #create a mask
+                        try:
+                            with open(mask) as f: pass
+                        except:					
+                            subprocess.call('gdal_calc.py -A ' + lulcmaptif + ' --A_band 1 --outfile=' + mask + ' --calc="A>0" --overwrite', shell=True)
+                        #perform segmentation GRASS 7
+        #                 grass.run_command("i.segment", group='te', output='lixolcover_sgm', threshold='0.6', minsize=minsize)
+                        #perform segmentation		
+                        s=otbsegmentation(lulcmaptif,mask,spatialr,maxiter,ranger,threshold,minsize,tilesize,simplify,vect_out)
+    			        #clean vector in grass
+                        grass.message(_("Cleaning segments in GRASS..."))
+                        checksegm = grass.find_file(element = 'vector', name = lulcmap+'_segm')
+                        if checksegm.get('fullname')=='':
+                              grass.run_command("v.in.ogr", dsn=vect_out, output=lulcmap+'_segm', snap='0.0002')
+                        try:
+                            with open(vect_out) as f: pass
+                            remove_shapefile(vect_out)
+                            grass.run_command("v.out.ogr", input=lulcmap+'_segm', type='area', dsn=vect_out)				
+                        except: 
+            				grass.message(_("Skipping cleaning segments..."))
+                        dataSource='exists'					
+                    summary_table=output_stats+'_summary.csv'
+                    if os.path.exists(summary_table)==False and dataSource!=None:		
+                        #integrate raster values in segments
+                        grass.message(_("Integrating segments and raster LULC values..."))
+                        #calculate areas and id for each segment				
+                        calculateidandareas(vect_out)			
+                        subprocess.call('starspan --vector '+vect_out +' --raster ' + lulcmaptif + ' --out-prefix ' +  output_stats + ' --out-type table --nodata 0 --skip_invalid_polys --elapsed_time --mask '+mask +' --summary-suffix _summary.csv --stats mode --fields ID --noColRow --noXY --RID none', shell=True)
+                        # integratesegmentationandraster (lulcmaptif,summary_table,vect_out)
+                        #join
+                        join_segments_and_csv(vect_out,summary_table)
+                        subprocess.call('ogr2ogr -overwrite ' + vect_out + ' ' + vect_out.replace('.shp','_join.shp'), shell=True)
+                        remove_shapefile(vect_out.replace('.shp','_join.shp'))		
+             
        #CHECK FOR MORE THAN ONE LULC MAP AND GENERATE LULC CHANGES MAP      
         if len(generatedgenlulc)>=2:
     	    # Loop thru all lulc for current tile and select min and max year as start and end for the change detection
