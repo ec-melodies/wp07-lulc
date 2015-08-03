@@ -184,13 +184,13 @@ def main():
 	
     # # Define computational region
     # grass.message("Setting computational region...")	
-    try:	
-        if proj_units=="meters":		
-            grass.run_command("g.region", rast = input, res= t_srx)
-        else:
-            grass.run_command("g.region", rast = input)	
-    except:
-        grass.fatal(_("GRASS is not able to define a computational region for LULC process. Please review selected input images."))
+    #try:	
+        # if proj_units=="meters":		
+            # grass.run_command("g.region", rast = input, res= t_srx)
+        # else:
+            # grass.run_command("g.region", rast = input)	
+    # except:
+        # grass.fatal(_("GRASS is not able to define a computational region for LULC process. Please review selected input images."))
 
     #Identify preliminary valid sub-Classes   
     classes= select_classes(t_mapset, source_location,"vector")

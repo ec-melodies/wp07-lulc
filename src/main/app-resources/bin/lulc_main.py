@@ -395,11 +395,11 @@ def main():
                         name_wet=imported_img
                         valid_seasons_imgs=valid_seasons_imgs+1
             fu = grass.find_file(element = 'cell', name = output+'_LULC@'+mapset)
-            if valid_seasons_imgs>=2 and fu.get('fullname')=='':
-                #CLOUD FILL
-                cloudfill(data.output,y,t,log_path)
+            if valid_seasons_imgs>=2 and fu.get('fullname')=='':	
                 #SET REGION
-                set_region(name_wet.replace('band','band1'),'meters','30')				
+                set_region(name_wet.replace('band','band1'),'meters','30')		
+                #CLOUD FILL
+                cloudfill(data.output,y,t,log_path)		
                 #CLASSIFY
                 p=grass.read_command("i.lulc.national.py", 
                                   input1st=[name_wet.replace('band','band1'), 
@@ -432,10 +432,14 @@ def main():
             all_testmaps = grass.find_file(element = 'cell', name = output+'testmap@'+mapset)		
             # generatedlulc = get_lulc_files(mapset, data.output+t+"*_LULC")
             for lulcmap in generatedlulc:
+                #Set Region
+                set_region(lulcmap,'','30')
+                #define file names for the following steps				
                 gen_lulcmap= lulcmap.strip()+'_gen'
                 lulcmaptif=os.path.join(non_grass_outputpath,gen_lulcmap+'.tif')			
                 testmap=lulcmap+'testmap'
-                #print all_gens.get(lulcmap)	
+                #Generalization				
+                #print all_gens.get(lulcmap)	#DEBUG
                 if all_gens.get('fullname')=='':
                     try:			
                         g=generalize_lulc(lulcmap,gen_lulcmap,int(MMU),False)
@@ -448,11 +452,6 @@ def main():
                 else:
                     generatedgenlulc.append(gen_lulcmap)
 		        #EXPORT LULC MAP OUT OF GRASS
-                # Define computational region
-                try:	
-                    grass.run_command("g.region", rast = lulcmap)	
-                except:
-                    grass.fatal(_("GRASS is not able to define a computational region for LULC process. Please review selected input images."))			
                 #Check if tif already on disk				
                 grass.run_command("r.out.gdal", input=gen_lulcmap, output=lulcmaptif, overwrite=True)
                 ciop.publish(lulcmaptif, metalink = True)					
