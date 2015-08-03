@@ -220,6 +220,7 @@ def main():
     skiptrainningdataverif = data.skiptrainningdataverif
     non_grass_outputpath = data.non_grass_outputpath
     log_path=data.log_path
+    mosaic=data.mosaic
     perform_segmentation=data.perform_segmentation
     filelist=non_grass_outputpath + '/filelist.txt'
  
@@ -374,10 +375,10 @@ def main():
     generatedlulc=[]
     generatedgenlulc=[]
     cont=0
-    for t in tiles:
+    for y in yearofimportedimgs:
         cont=cont+1
-        grass.message("Processing image " + str(cont) + " out of " + str(len(tiles)))
-        for y in yearofimportedimgs:
+        for t in tiles:
+            grass.message("Processing image " + str(cont) + " out of " + str(len(tiles)))		
             output=data.output+t+'_'+y
             if replace=='yes':
                 remove_existing_grassfiles(output+'_LULC@'+mapset)
@@ -463,6 +464,28 @@ def main():
                         p=grass.run_command("r.kappa", classification=gen_lulcmap, reference=testmap, output=errormatrix, overwrite=True)		
                     except:
                         grass.message("No testmap was found!")
+						
+        #CREATE A MOSAIC PER YEAR
+        mosaic_layers = get_lulc_files(mapset, data.output+'*'+y+"*_LULC")
+        print mosaic_layers 		
+        if mosaic=='yes':
+            grass.message(("Creating LULC mosaic for the year " + str(y)))
+            #set region
+            set_region(mosaic_layers,'','30')
+            #mosaic
+            tempgen='tempgen'
+            mosaic_name='LULCmosaic'+str(y))         			
+            grass.run_command('r.patch',input=mosaic_layers, output=tempgen, overwrite=True)
+			#generalize mosaic
+            try:			
+                g=generalize_lulc(tempgen,mosaic_name,int(MMU),False)
+            except:
+                grass.warning(_("Unable to generalize "+mosaic_name))
+                g=1
+            grass.run_command("g.remove", flags = "f", quiet=True, rast=tempgen)				
+            #export
+            mosaic_tif_name=os.path.join(non_grass_outputpath,mosaic_name+'.tif')				
+            grass.run_command("r.out.gdal", input=mosaic_name, output=mosaic_tif_name, overwrite=True)								
 				    
         #SEGMENTATION AND INTEGRATION OF LULC
         if perform_segmentation=="yes":		
@@ -551,20 +574,7 @@ def main():
                     grass.run_command("g.remove", flags = "f", quiet=True, rast=temp)					
         else:
             grass.message(_("No available LULC maps where found to generate LULC changes map in tile " + t))
-    
-    #CREATE A MOSAIC OF ALL LULC SCEENES
-    if len(set(generatedlulctifs))>=1:
-        for y in yearofimportedimgs:
-            list = open(filelist, 'w')
-            grass.message(("Creating LULC mosaic for the year " + str(y)))	
-            for lulcmaptif in set(generatedlulctifs):
-                if lulcmaptif[-17:-13]==y:
-                    list.write(lulcmaptif)	
-                    list.write('\n')
-            list.close()
-            print os.system('gdalbuildvrt -allow_projection_difference -input_file_list '+str(filelist)+' '+non_grass_outputpath+'/LULCmosaic'+str(y)+'.vrt')
-            os.remove(filelist)
-    
+      
     #calculate and print total processing time
     endtime=datetime.datetime.now()		
     print 'Total process duration = ' + str(endtime-starttime)
