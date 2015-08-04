@@ -69,6 +69,7 @@ def main():
     input2 = options['input2nd'].split(",") 
     input= input1 + input2
     output_pre = options['output']
+    user_trainning_data = options['user_trainning_data']	
 	
     # Define output files
     output= output_pre + '_LULC' 
@@ -193,7 +194,7 @@ def main():
         # grass.fatal(_("GRASS is not able to define a computational region for LULC process. Please review selected input images."))
 
     #Identify preliminary valid sub-Classes   
-    classes= select_classes(t_mapset, source_location,"vector")
+    classes= select_classes(t_mapset, source_location,"vector",user_trainning_data)
     if classes=='':
        eliminate_rastermaps([NDVItemp1,NDVItemp2])		
        eliminate_rasterlists('myscript.tmp*', t_mapset)    
@@ -210,7 +211,7 @@ def main():
        grass.fatal(_("Not possible to eliminate null values from training areas. Please review defined training areas."))
 
     # Create final list of existing classes
-    classes= select_classes(t_mapset, source_location,"raster")
+    classes= select_classes(t_mapset, source_location,"raster",user_trainning_data)
     if classes=='':
        eliminate_rastermaps([NDVItemp1,NDVItemp2,"mask_map__t"])	
        eliminate_rasterlists('*__t', t_mapset)    
@@ -614,10 +615,14 @@ def ndvi_identifier(input):
           id=x
     return id
 
-def select_classes(mapset, location,classes_format):  
+def select_classes(mapset,location,classes_format,user_trainning_data):  
 # # # # # Function to identify, evaluate and convert to raster, when applicable, each subclass
     
-    all_classes=['subclass01','subclass02','subclass03','subclass04','subclass05','subclass06','subclass07','subclass08','subclass09','subclass10','subclass11','subclass12','subclass13','subclass14','subclass15','subclass16','subclass17']          
+    if user_trainning_data==1:
+        all_classes=['user_subclass01','user_subclass02','user_subclass03','user_subclass04','user_subclass05','user_subclass06','user_subclass07','user_subclass08','user_subclass09','user_subclass10','user_subclass11','user_subclass12','user_subclass13','user_subclass14','user_subclass15','user_subclass16','user_subclass17'] 
+    else:		
+        all_classes=['subclass01','subclass02','subclass03','subclass04','subclass05','subclass06','subclass07','subclass08','subclass09','subclass10','subclass11','subclass12','subclass13','subclass14','subclass15','subclass16','subclass17']          
+          
 
     if classes_format=='vector':
          element_id= "vector"
@@ -664,7 +669,7 @@ def random_subset(input, output_name, value):
 	
 def class_value(input):
 # # # # # Retrieve class INT value from subclass filename
-    value=int(input[8:])
+    value=int(input[-2:])
     return value	
     	
 	
