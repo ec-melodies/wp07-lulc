@@ -228,7 +228,8 @@ def main():
     threshold = data.threshold
     minsize = data.minsize
     tilesize = data.tilesize
-    replace = data.replace
+    replace_maps = data.replace_maps
+    replace_images = data.replace_images
     simplify = data.simplify
     skiptrainningdataverif = data.skiptrainningdataverif
     non_grass_outputpath = data.non_grass_outputpath
@@ -240,7 +241,7 @@ def main():
     if link!='':
         user_training_data = get_user_training_data(link,os.path.join(non_grass_outputpath,'utd.zip'),os.path.join(non_grass_outputpath,'utd'))
         if user_training_data==1:
-            replace='yes' 
+            replace_maps='yes' 
     else:
         user_training_data=0	
  
@@ -353,7 +354,7 @@ def main():
         print output_band_list[0]
         name_in_grass=output_l[0][0:4]+'_band_'+output+'_'+season+'@'+mapset
         fu = grass.find_file(element = 'cell', name = name_in_grass.replace('band','band2'))
-        if fu.get('fullname')=='' or replace=='yes':
+        if fu.get('fullname')=='' or replace_images=='yes':
             grass.run_command("r.in.landsat.new.py", 
                               year=output_l[0][0:4], 
                               month=output_l[0][5:7], 
@@ -403,7 +404,7 @@ def main():
         for t in tiles:
             grass.message("Processing image " + str(cont) + " out of " + str(len(tiles)))		
             output=data.output+t+'_'+y
-            if replace=='yes':
+            if replace_maps=='yes':
                 remove_existing_grassfiles(output+'_LULC@'+mapset)
             # print imported    #DEBUG
             valid_seasons_imgs=0
