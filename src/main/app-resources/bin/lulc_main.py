@@ -486,31 +486,31 @@ def main():
                 errormatrix=os.path.join(non_grass_outputpath,gen_lulcmap.strip()+'_errormatrix')
                 if not os.path.isfile(errormatrix):
                     try:			
-                        p=grass.run_command("r.kappa", classification=gen_lulcmap, reference=testmap, output=errormatrix, overwrite=True)		
+                        p=grass.run_command("r.kappa", classification=lulcmap, reference=testmap, output=errormatrix, overwrite=True)		
                     except:
                         grass.message("No testmap was found!")
 						
-        #CREATE A MOSAIC PER YEAR
+        #CREATE A MOSAIC OF ALL LULC SCEENES
         mosaic_layers = get_lulc_files(mapset, data.output+'*'+y+"*_LULC")
-        print mosaic_layers 		
-        if mosaic=='yes':
-            grass.message(("Creating LULC mosaic for the year " + str(y)))
-            #set region
-            set_region(mosaic_layers,'','30')
-            #mosaic
-            tempgen='tempgen'
-            mosaic_name='LULCmosaic'+str(y)         			
-            grass.run_command('r.patch',input=mosaic_layers, output=tempgen, overwrite=True)
-			#generalize mosaic
-            try:			
-                g=generalize_lulc(tempgen,mosaic_name,int(MMU),False)
-            except:
-                grass.warning(_("Unable to generalize "+mosaic_name))
-                g=1
-            grass.run_command("g.remove", flags = "f", quiet=True, rast=tempgen)				
-            #export
-            mosaic_tif_name=os.path.join(non_grass_outputpath,mosaic_name+'.tif')				
-            grass.run_command("r.out.gdal", input=mosaic_name, output=mosaic_tif_name, overwrite=True)								
+        if len(mosaic_layers)>=2: 		
+            if mosaic=='yes':
+                grass.message(("Creating LULC mosaic for the year " + str(y)))
+                #set region
+                set_region(mosaic_layers,'','30')
+                #mosaic
+                tempgen='tempgen'
+                mosaic_name='LULCmosaic'+str(y)         			
+                grass.run_command('r.patch',input=mosaic_layers, output=tempgen, overwrite=True)
+			    #generalize mosaic
+                try:			
+                    g=generalize_lulc(tempgen,mosaic_name,int(MMU),False)
+                except:
+                    grass.warning(_("Unable to generalize "+mosaic_name))
+                    g=1
+                grass.run_command("g.remove", flags = "f", quiet=True, rast=tempgen)				
+                #export
+                mosaic_tif_name=os.path.join(non_grass_outputpath,mosaic_name+'.tif')				
+                grass.run_command("r.out.gdal", input=mosaic_name, output=mosaic_tif_name, overwrite=True)								
 				    
         #SEGMENTATION AND INTEGRATION OF LULC
         if perform_segmentation=="yes":		
