@@ -7,7 +7,7 @@
         <parameter id="tiles" title="Tiles" abstract="Set the Tile(s) you want to generate" scope="runtime">180032</parameter>
         <parameter id="years" title="Years" abstract="Set the Years(s) you want to generate" scope="runtime">2000,2010</parameter>
         <parameter id="MMU" title="MMU" abstract="Set the Minimum Mapping Unit in hectares for your final Land Cover map" scope="runtime">5</parameter>
-        <parameter id="User_trainning_data" title="User trainning data" abstract="Paste link to User Trainning Data zip file" scope="runtime" />
+        <parameter id="User_training_data" title="User training data" abstract="Paste link to User Training Data zip file" scope="runtime" />
       </defaultParameters>
       <defaultJobconf>
         <property id="mapred.task.timeout">9900000000000</property>
