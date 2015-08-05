@@ -11,7 +11,7 @@ from otbfunctions import *
 from getlandsat import *
 from icloudfill import * 
 
-def get_user_trainning_data(link,output,outputpath):
+def get_user_training_data(link,output,outputpath):
     subprocess.call("curl "+link+" -o "+output, shell=True)
     print 'success downloading'
     zf=zipfile.ZipFile(output)
@@ -236,13 +236,13 @@ def main():
     mosaic=data.mosaic
     perform_segmentation=data.perform_segmentation
     filelist=non_grass_outputpath + '/filelist.txt'
-    link = ciop.getparam('User_trainning_data')
+    link = ciop.getparam('user_training_data')
     if link!='':
-        user_trainning_data = get_user_trainning_data(link,os.path.join(non_grass_outputpath,'utd.zip'),os.path.join(non_grass_outputpath,'utd'))
-        if user_trainning_data==1:
+        user_training_data = get_user_training_data(link,os.path.join(non_grass_outputpath,'utd.zip'),os.path.join(non_grass_outputpath,'utd'))
+        if user_training_data==1:
             replace='yes' 
     else:
-        user_trainning_data=0	
+        user_training_data=0	
  
     #Setup Grass GISbase, GISdbase, location and mapset
     gsetup.init(gisbase,
@@ -291,7 +291,7 @@ def main():
         grass.message('\nChecking existing training data for all selected tiles...\n\n')
         tileiter=''
         removeimgs=[]
-        if user_trainning_data==1:
+        if user_training_data==1:
             all_classes=['user_subclass01','user_subclass02','user_subclass03','user_subclass04','user_subclass05','user_subclass06','user_subclass07','user_subclass08','user_subclass09','user_subclass10','user_subclass11','user_subclass12','user_subclass13','user_subclass14','user_subclass15','user_subclass16','user_subclass17'] 
         else:		
             all_classes=['subclass01','subclass02','subclass03','subclass04','subclass05','subclass06','subclass07','subclass08','subclass09','subclass10','subclass11','subclass12','subclass13','subclass14','subclass15','subclass16','subclass17']          
@@ -421,7 +421,7 @@ def main():
             fu = grass.find_file(element = 'cell', name = output+'_LULC@'+mapset)
             if valid_seasons_imgs>=2 and fu.get('fullname')=='':	
                 #SET REGION
-                set_region(name_wet.replace('band','band1'),'meters','30')		
+                set_region(name_wet.replace('band','band1'),'','')		
                 #CLOUD FILL
                 cloudfill(data.output,y,t,log_path)		
                 #CLASSIFY
@@ -441,7 +441,7 @@ def main():
                                             name_dry.replace('band','ndvi'), 
                                             name_dry.replace('band','band7')], 
                                   output=output,
-                                  user_trainning_data=user_trainning_data)		  
+                                  user_training_data=user_training_data)		  
                 # append generated lulc's to a list which will be processed further			
                 generatedlulc = get_lulc_files(mapset, output+'_LULC')
                 if p!=0 and output+'_LULC' not in generatedlulc:	

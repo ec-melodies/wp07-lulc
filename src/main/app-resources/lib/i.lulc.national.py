@@ -42,7 +42,12 @@
 #%  description: Prefix for output raster data (<prefix>_LULC):
 #%  required: yes
 #%end
-
+#%option
+#%  key: user_training_data
+#%  type: integer
+#%  description: 1-use user training data; 0-use default training data:
+#%  required: yes
+#%end
 
 import grass.script as grass 
 import sys
@@ -69,7 +74,7 @@ def main():
     input2 = options['input2nd'].split(",") 
     input= input1 + input2
     output_pre = options['output']
-    user_trainning_data = options['user_trainning_data']	
+    user_training_data = options['user_training_data']	
 	
     # Define output files
     output= output_pre + '_LULC' 
@@ -194,7 +199,7 @@ def main():
         # grass.fatal(_("GRASS is not able to define a computational region for LULC process. Please review selected input images."))
 
     #Identify preliminary valid sub-Classes   
-    classes= select_classes(t_mapset, source_location,"vector",user_trainning_data)
+    classes= select_classes(t_mapset, source_location,"vector",user_training_data)
     if classes=='':
        eliminate_rastermaps([NDVItemp1,NDVItemp2])		
        eliminate_rasterlists('myscript.tmp*', t_mapset)    
@@ -211,7 +216,7 @@ def main():
        grass.fatal(_("Not possible to eliminate null values from training areas. Please review defined training areas."))
 
     # Create final list of existing classes
-    classes= select_classes(t_mapset, source_location,"raster",user_trainning_data)
+    classes= select_classes(t_mapset, source_location,"raster",user_training_data)
     if classes=='':
        eliminate_rastermaps([NDVItemp1,NDVItemp2,"mask_map__t"])	
        eliminate_rasterlists('*__t', t_mapset)    
@@ -226,7 +231,7 @@ def main():
     classes_test=[""]	
     for x in classes:
        # Generate signature
-       p=grass.run_command("i.gensig", group=group_name, subgroup="subgroup", trainingmap=x, signaturefile=x, overwrite=True)
+       p=grass.run_command("i.gensig", group=group_name, subgroup="subgroup", trainingmap=x, signaturefile=x, overwrite=True, quiet=True)
        grass.message(_("Processing class: " + str(x)))	   
        if p!=0:
           eliminate_rastermaps([NDVItemp1,NDVItemp2,"mask_map__t"])	
@@ -246,7 +251,7 @@ def main():
             #grass.mapcalc("$output= $input", output=t_class, national=national_mask, input=x)		#DEBUG - This skips outlier detection which is crucial  
           #except:
             #p=-1
-          p=grass.run_command("i.outdetect.exe", group=group_name, subgroup="subgroup", overwrite=True, sigfile=x, class_out=t_class, original=x, verbose=True)
+          p=grass.run_command("i.outdetect.exe", group=group_name, subgroup="subgroup", overwrite=True, sigfile=x, class_out=t_class, original=x, quiet=True)
           # p=0		  
           if p!=0:
              eliminate_rastermaps([NDVItemp1,NDVItemp2,"mask_map__t"])	
@@ -615,14 +620,10 @@ def ndvi_identifier(input):
           id=x
     return id
 
-def select_classes(mapset,location,classes_format,user_trainning_data):  
+def select_classes(mapset, location,classes_format,user_training_data):  
 # # # # # Function to identify, evaluate and convert to raster, when applicable, each subclass
     
-    if user_trainning_data==1:
-        all_classes=['user_subclass01','user_subclass02','user_subclass03','user_subclass04','user_subclass05','user_subclass06','user_subclass07','user_subclass08','user_subclass09','user_subclass10','user_subclass11','user_subclass12','user_subclass13','user_subclass14','user_subclass15','user_subclass16','user_subclass17'] 
-    else:		
-        all_classes=['subclass01','subclass02','subclass03','subclass04','subclass05','subclass06','subclass07','subclass08','subclass09','subclass10','subclass11','subclass12','subclass13','subclass14','subclass15','subclass16','subclass17']          
-          
+    all_classes=['subclass01','subclass02','subclass03','subclass04','subclass05','subclass06','subclass07','subclass08','subclass09','subclass10','subclass11','subclass12','subclass13','subclass14','subclass15','subclass16','subclass17']          
 
     if classes_format=='vector':
          element_id= "vector"
@@ -632,28 +633,35 @@ def select_classes(mapset,location,classes_format,user_trainning_data):
     valid_classes=[]
     for x in all_classes:        
         #Verify if exists in current mapset/location
-        check_input= grass.find_file(x, element = element_id, mapset=mapset)    		
+        if user_training_data=='1' and element_id== "vector":		
+            check_input= grass.find_file('user_'+x, element = element_id, mapset=mapset)  
+        else:		
+            check_input= grass.find_file(x, element = element_id, mapset=mapset) 	    		
         if check_input['fullname'] !="":    
             if classes_format=='vector':
                 # Retrieve raster final raster value				
                 value=class_value(x)   
                 #Convert training areas (vector to raster)			
-                p=grass.run_command("v.to.rast", input=x, output=x, use="val", value=value, overwrite=True, quiet=True)       
+                if user_training_data=='1':				
+                    p=grass.run_command("v.to.rast", input='user_'+x, output=x, use="val", value=value, overwrite=True, quiet=True)
+                else:
+                    p=grass.run_command("v.to.rast", input=x, output=x, use="val", value=value, overwrite=True, quiet=True)	       
                 if p!=0:
                    grass.fatal(_("DWE-IS was not able to convert %s training area to raster map. Please review available training areas."),x)           		   
-            #Subset for test sample
-            random_subset(x, x+'_test', '20%')		
+            else:
+                #Subset for test sample
+                random_result=random_subset(x, x+'_test', '20%')
+                check_valid= valid_class(x+'_test')	
+                if check_valid==0:
+                    valid_classes=valid_classes + [x+'_test']
+                else:
+                    eliminate_rastermaps([x+'_test'])					
             #Verify if it has any valid values
-            check_valid= valid_class(x)	
+            check_valid= valid_class(x)
             if check_valid==0:
               valid_classes=valid_classes + [x]
             else:
-              eliminate_rastermaps([x])		
-            check_valid= valid_class(x+'_test')	
-            if check_valid==0:
-              valid_classes=valid_classes + [x+'_test']
-            else:
-              eliminate_rastermaps([x+'_test'])			  
+              eliminate_rastermaps([x])					  
     return valid_classes
 
 def random_subset(input, output_name, value):
@@ -669,7 +677,7 @@ def random_subset(input, output_name, value):
 	
 def class_value(input):
 # # # # # Retrieve class INT value from subclass filename
-    value=int(input[-2:])
+    value=int(input[8:])
     return value	
     	
 	
