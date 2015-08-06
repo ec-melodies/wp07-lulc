@@ -6,6 +6,7 @@ import grass.script.setup as gsetup
 import urllib
 import cioppy
 import glob
+import urlparse
 from Gdalfunctions import *
 from otbfunctions import * 
 from getlandsat import *
@@ -237,13 +238,14 @@ def main():
     mosaic=data.mosaic
     perform_segmentation=data.perform_segmentation
     filelist=non_grass_outputpath + '/filelist.txt'
-    link = ciop.getparam('user_training_data')
-    if link!='':
+    link = ciop.getparam('User_training_data')
+    parts = urlparse.urlsplit(link)
+    if not parts.scheme or not parts.netloc: 
+        user_training_data=0
+    else:		
         user_training_data = get_user_training_data(link,os.path.join(non_grass_outputpath,'utd.zip'),os.path.join(non_grass_outputpath,'utd'))
         if user_training_data==1:
             replace_maps='yes' 
-    else:
-        user_training_data=0	
  
     #Setup Grass GISbase, GISdbase, location and mapset
     gsetup.init(gisbase,
@@ -406,6 +408,7 @@ def main():
             output=data.output+t+'_'+y
             if replace_maps=='yes':
                 remove_existing_grassfiles(output+'_LULC@'+mapset)
+                remove_existing_grassfiles(output+'_LULC_gen@'+mapset)				
             # print imported    #DEBUG
             valid_seasons_imgs=0
             name_dry = None
