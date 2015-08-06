@@ -4,6 +4,7 @@ import os,sys,datetime,imp
 import grass.script as grass
 import grass.script.setup as gsetup
 import urllib
+import shutil
 import cioppy
 import glob
 import urlparse
@@ -21,8 +22,10 @@ def get_user_training_data(link,output,outputpath):
     for file in glob.glob(os.path.join(outputpath,"subclass*shp")):
         class_file=os.path.splitext(os.path.basename(file))[0]
         grass.run_command("v.in.ogr", dsn=file, output='user_'+class_file, snap='0.0002', overwrite=True, quiet=True)
-        print 'success importing subclass'		
-    return 1	
+        print 'success importing subclass'
+    os.remove(output)
+    shutil.rmtree(outputpath)	
+    return 1
 
 def set_region(layer,proj_units,t_srx):
     # Define computational region
