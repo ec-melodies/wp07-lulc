@@ -135,29 +135,53 @@ def applyreclass(reclass_path, inp, outp):
     if p!=0:
         grass.warning(_("Not possible to reclassify. Try again."))     
 
-def generalize_lulc(lulcmap,gen_lulcmap,mmu,skipmajfilter):
+def generalize_lulc(lulcmap,gen_lulcmap,mmu,skipmajfilter,method):
     grass.message(_("Generalizing " + str(lulcmap))) 
     # Define computational region
     try:	
         grass.run_command("g.region", rast = lulcmap)	
     except:
         grass.fatal(_("GRASS is not able to define a computational region. Please review selected input images."))
-    if skipmajfilter==False:
-        temp2='temp2'	
-        grass.run_command("r.neighbors",input=lulcmap, output=temp2, size='3', method='mode', overwrite=True)
-        lulcmap=temp2		
-    if mmu>0:
-        if skipmajfilter==True:
-            temp=gen_lulcmap
-        else:			
-            temp='temp'	
-        grass.run_command("r.reclass.area", input=lulcmap, output=temp, greater=mmu, quiet=True, overwrite=True)
-    else:
-        temp=lulcmap
-    if skipmajfilter==False:		
-        grass.run_command("r.neighbors",input=temp, output=gen_lulcmap, size='3', method='mode', overwrite=True)
-    return 0		
- 
+    if method=='lucc':		
+        if skipmajfilter==False:
+            temp2='temp2'	
+            grass.run_command("r.neighbors",input=lulcmap, output=temp2, size='3', method='mode', overwrite=True)
+            lulcmap=temp2		
+        if mmu>0:
+            if skipmajfilter==True:
+                temp=gen_lulcmap
+            else:			
+                temp='temp'	
+            grass.run_command("r.reclass.area", input=lulcmap, output=temp, greater=mmu, quiet=True, overwrite=True)
+        else:
+            temp=lulcmap
+        if skipmajfilter==False:		
+            grass.run_command("r.neighbors",input=temp, output=gen_lulcmap, size='3', method='mode', overwrite=True)
+        return 0
+    elif method=='lulc':
+        stats_map=grass.read_command('r.univar', map=lulcmap, flags='g')
+        lulc_cells=int(stats_map.split()[0].split('=')[1])	
+        grass.run_command("g.copy",rast=(lulcmap,'tempmap'), overwrite=True)
+        diff_cells=10
+        count=1
+        while diff_cells>=1:
+            grass.run_command("r.neighbors",input='tempmap', output='temp_t0', size=3, method='mode', overwrite=True)
+            grass.run_command("r.reclass.area", input='temp_t0', output='temp_t1', lesser=mmu, overwrite=True)
+            count=count+1
+            grass.run_command('g.region', rast=lulcmap, res=(0.0003164*count))
+            grass.run_command("g.copy",rast=('temp_t1','temp_t2'), overwrite=True)
+            grass.run_command('g.region', rast=lulcmap)
+            grass.run_command("r.reclass.area", input='temp_t0', output='temp_t3', greater=mmu, quiet=True, overwrite=True)
+            grass.run_command("r.patch", input='temp_t2,temp_t3', output='tempmap', overwrite=True)
+            stats_gen=grass.read_command('r.univar', map='temp_t3', flags='g')
+            gen_cells=int(stats_gen.split()[0].split('=')[1])
+            diff_cells=float(lulc_cells-gen_cells)/float(lulc_cells)*100
+        grass.run_command("g.copy",rast=('temp_t0',gen_lulcmap), overwrite=True)
+        for t in 'tempmap','temp_t1','temp_t2','temp_t3','temp_t0':
+            remove_existing_grassfiles(t)		
+        return 0			
+			
+
 def landsat8_QAmask(inputQAband):
     inputQAmask=inputQAband.replace("QA","mask")
     try:
@@ -474,7 +498,7 @@ def main():
                 #print all_gens.get(lulcmap)	#DEBUG
                 if all_gens.get('fullname')=='':
                     try:			
-                        g=generalize_lulc(lulcmap,gen_lulcmap,int(MMU),False)
+                        g=generalize_lulc(lulcmap,gen_lulcmap,int(MMU),False,'lulc')
                     except:
                         grass.warning(_("Unable to generalize "+lulcmap))
                         g=1
@@ -489,12 +513,11 @@ def main():
                 ciop.publish(lulcmaptif, metalink = True)					
                 generatedlulctifs.append(lulcmaptif)
                 #ACCURACY ASSESSMENT			
-                errormatrix=os.path.join(non_grass_outputpath,gen_lulcmap.strip()+'_errormatrix')
-                if not os.path.isfile(errormatrix):
-                    try:			
-                        p=grass.run_command("r.kappa", classification=lulcmap, reference=testmap, output=errormatrix, overwrite=True)		
-                    except:
-                        grass.message("No testmap was found!")
+                errormatrix=os.path.join(non_grass_outputpath,lulcmap.strip()+'_errormatrix')
+                try:			
+                    p=grass.run_command("r.kappa", classification=lulcmap, reference=testmap, output=errormatrix, overwrite=True)		
+                except:
+                    grass.message("No testmap was found!")
 						
         #CREATE A MOSAIC OF ALL LULC SCEENES
         mosaic_layers = get_lulc_files(mapset, data.output+'*'+y+"*_LULC")
@@ -509,7 +532,7 @@ def main():
                 grass.run_command('r.patch',input=mosaic_layers, output=tempgen, overwrite=True)
 			    #generalize mosaic
                 try:			
-                    g=generalize_lulc(tempgen,mosaic_name,int(MMU),False)
+                    g=generalize_lulc(tempgen,mosaic_name,int(MMU),False,'lulc')
                 except:
                     grass.warning(_("Unable to generalize "+mosaic_name))
                     g=1
@@ -594,7 +617,7 @@ def main():
                     applyreclass(reclass_path, lulcchanges, temp)
                     p=grass.mapcalc("$out=if($B1<0,null(),$B1)", out=lulcchangesreclass, B1=temp)
 				    #generalize LUCC
-                    generalize_lulc(lulcchangesreclass,lulcchangesgen,int(MMU),True)	
+                    generalize_lulc(lulcchangesreclass,lulcchangesgen,int(MMU),True,'lucc')	
                     #apply color map			
                     applycolormap(color_path, lulcchangesgen, gisbase)
                     #export to tif			
