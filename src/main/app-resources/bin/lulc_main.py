@@ -162,12 +162,12 @@ def generalize_lulc(lulcmap,gen_lulcmap,mmu,skipmajfilter,method):
         stats_map=grass.read_command('r.univar', map=lulcmap, flags='g')
         lulc_cells=int(stats_map.split()[0].split('=')[1])	
         grass.run_command("g.copy",rast=(lulcmap,'tempmap'), overwrite=True)
-        diff_cells=10
+        diff_cells=15
         count=1
-        while diff_cells>=1:
+        while diff_cells>0.5:
             grass.run_command("r.neighbors",input='tempmap', output='temp_t0', size=3, method='mode', overwrite=True)
             grass.run_command("r.reclass.area", input='temp_t0', output='temp_t1', lesser=mmu, overwrite=True)
-            count=count+1
+            count=count+1.5
             grass.run_command('g.region', rast=lulcmap, res=(0.0003164*count))
             grass.run_command("g.copy",rast=('temp_t1','temp_t2'), overwrite=True)
             grass.run_command('g.region', rast=lulcmap)
@@ -176,10 +176,13 @@ def generalize_lulc(lulcmap,gen_lulcmap,mmu,skipmajfilter,method):
             stats_gen=grass.read_command('r.univar', map='temp_t3', flags='g')
             gen_cells=int(stats_gen.split()[0].split('=')[1])
             diff_cells=float(lulc_cells-gen_cells)/float(lulc_cells)*100
-        grass.run_command("g.copy",rast=('temp_t0',gen_lulcmap), overwrite=True)
+        grass.run_command("r.neighbors",input='tempmap', output='temp_t0', size=3, method='mode', overwrite=True)			
+        grass.mapcalc("$output= if(isnull($mask),null(),$input)", output=gen_lulcmap, input='temp_t0', mask=lulcmap, overwrite=True)
+        color_path= os.path.join('/application','symbology','color','dwecolor') 
+        grass.run_command('r.colors', map = gen_lulcmap, rules = color_path, quiet=True)		
         for t in 'tempmap','temp_t1','temp_t2','temp_t3','temp_t0':
             remove_existing_grassfiles(t)		
-        return 0			
+        return 0		
 			
 
 def landsat8_QAmask(inputQAband):
@@ -435,7 +438,8 @@ def main():
             output=data.output+t+'_'+y
             if replace_maps=='yes':
                 remove_existing_grassfiles(output+'_LULC@'+mapset)
-                remove_existing_grassfiles(output+'_LULC_gen@'+mapset)				
+                remove_existing_grassfiles(output+'_LULC_gen@'+mapset)
+                remove_existing_grassfiles(output+'_LULCtestmap@'+mapset)				
             # print imported    #DEBUG
             valid_seasons_imgs=0
             name_dry = None
