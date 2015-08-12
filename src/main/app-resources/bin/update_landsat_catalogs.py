@@ -16,6 +16,7 @@
 
 import os, imp
 import subprocess
+from download_landsat_scene import getmetadatafiles
 
 def getVarFromFile(filename):
     import imp
@@ -32,6 +33,7 @@ getVarFromFile(variablesfile)
 image_path=data.image_path
 credentialsfile = data.usgscredentialsfile
 
+getmetadatafiles(image_path,'update')
 
-subprocess.call('download_landsat_scene.py -z unzip -o catalog -d 20000101 -f 20000102 -k update -s 180031 -u '+credentialsfile+' --output '+image_path+' --outputcatalogs '+image_path, shell=True)
+#subprocess.call('download_landsat_scene.py -z unzip -o catalog -d 20000101 -f 20000102 -k update -s 180031 -u '+credentialsfile+' --output '+image_path+' --outputcatalogs '+image_path, shell=True)
 	
