@@ -11,7 +11,8 @@ import urlparse
 from Gdalfunctions import *
 from otbfunctions import * 
 from getlandsat import *
-from icloudfill import * 
+from icloudfill import *
+from write_metadata import * 
 
 def get_user_training_data(link,output,outputpath):
     subprocess.call("curl "+link+" -o "+output, shell=True)
@@ -514,12 +515,14 @@ def main():
 		        #EXPORT LULC MAP OUT OF GRASS
                 #Check if tif already on disk				
                 grass.run_command("r.out.gdal", input=gen_lulcmap, output=lulcmaptif, overwrite=True)
+                write_metadata(lulcmaptif.replace('.tif','_metadata.xml'),gen_lulcmap,lulcmaptif)		
                 ciop.publish(lulcmaptif, metalink = True)					
                 generatedlulctifs.append(lulcmaptif)
                 #ACCURACY ASSESSMENT			
                 errormatrix=os.path.join(non_grass_outputpath,lulcmap.strip()+'_errormatrix')
                 try:			
-                    p=grass.run_command("r.kappa", classification=lulcmap, reference=testmap, output=errormatrix, overwrite=True)		
+                    p=grass.run_command("r.kappa", classification=lulcmap, reference=testmap, output=errormatrix, overwrite=True)
+                    ciop.publish(errormatrix, metalink = True)					
                 except:
                     grass.message("No testmap was found!")
 						
