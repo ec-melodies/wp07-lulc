@@ -9,7 +9,7 @@ default_abstract="The Land Use/Land Cover (LULC) service will generate maps of L
 default_purpose="Local land use and land cover changes are fundamental agents of global climate change and are significant forces that impact biodiversity, water and radiation budgets, trace gas emissions, and ultimately, climate at all scales."
 default_credit="The workflow that generated this data was developed by Critical Software, S.A."
 
-def write_metadataWetSeason(outputfile,productid,product,DrySeason,WetSeason,gen_mmu):
+def write_metadata(outputfile,productid,product,DrySeason,WetSeason,gen_mmu):
     #extract boundingbox coordinates
     info=subprocess.Popen(["gdalinfo", product], stdout=subprocess.PIPE)
     outp = info.stdout.read()
@@ -76,7 +76,7 @@ def write_metadataWetSeason(outputfile,productid,product,DrySeason,WetSeason,gen
     ET.SubElement(alternateTitle, "gco:CharacterString").text = productid
     CI_Date = ET.SubElement(CI_Citation, "gmd:CI_Date")	
     date = ET.SubElement(CI_Date, "gmd:date")
-    ET.SubElement(date, "gco:Date").text = datetime.datetime.now()	
+    ET.SubElement(date, "gco:Date").text = str(datetime.datetime.now())
     dateType = ET.SubElement(CI_Date, "gmd:dateType")
     ET.SubElement(dateType, "gco:CI_DateTypeCode", codeList="#CI_DateTypeCode", codeListValue="creation").text = "Criacao"	
     abstract = ET.SubElement(MD_DataIdentification, "gmd:abstract")
