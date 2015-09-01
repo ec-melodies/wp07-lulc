@@ -515,7 +515,7 @@ def main():
 		        #EXPORT LULC MAP OUT OF GRASS
                 #Check if tif already on disk				
                 grass.run_command("r.out.gdal", input=gen_lulcmap, output=lulcmaptif, overwrite=True)
-                write_metadata(lulcmaptif.replace('.tif','_metadata.xml'),gen_lulcmap,lulcmaptif)		
+                write_metadata(lulcmaptif.replace('.tif','_metadata.xml'),gen_lulcmap,lulcmaptif,name_dry,name_wet,mmu)		
                 ciop.publish(lulcmaptif, metalink = True)					
                 generatedlulctifs.append(lulcmaptif)
                 #ACCURACY ASSESSMENT			

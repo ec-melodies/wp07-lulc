@@ -9,7 +9,7 @@ default_abstract="The Land Use/Land Cover (LULC) service will generate maps of L
 default_purpose="Local land use and land cover changes are fundamental agents of global climate change and are significant forces that impact biodiversity, water and radiation budgets, trace gas emissions, and ultimately, climate at all scales."
 default_credit="The workflow that generated this data was developed by Critical Software, S.A."
 
-def write_metadata(outputfile,productid,product):
+def write_metadataWetSeason(outputfile,productid,product,DrySeason,WetSeason,gen_mmu):
     #extract boundingbox coordinates
     info=subprocess.Popen(["gdalinfo", product], stdout=subprocess.PIPE)
     outp = info.stdout.read()
@@ -71,12 +71,12 @@ def write_metadata(outputfile,productid,product):
     citation = ET.SubElement(MD_DataIdentification, "gmd:citation")
     CI_Citation = ET.SubElement(citation, "gmd:CI_Citation")
     title = ET.SubElement(CI_Citation, "gmd:title")
-    ET.SubElement(title, "gco:CharacterString").text = "Ortofotocarta DGRF/IGP 004161A"	
+    ET.SubElement(title, "gco:CharacterString").text = "MELODIES Land Cover product for desertification monitoring purposes"	
     alternateTitle = ET.SubElement(CI_Citation, "gmd:alternateTitle")
-    ET.SubElement(alternateTitle, "gco:CharacterString").text = "004161A"
+    ET.SubElement(alternateTitle, "gco:CharacterString").text = productid
     CI_Date = ET.SubElement(CI_Citation, "gmd:CI_Date")	
     date = ET.SubElement(CI_Date, "gmd:date")
-    ET.SubElement(date, "gco:Date").text = "2004-11-01"	
+    ET.SubElement(date, "gco:Date").text = datetime.datetime.now()	
     dateType = ET.SubElement(CI_Date, "gmd:dateType")
     ET.SubElement(dateType, "gco:CI_DateTypeCode", codeList="#CI_DateTypeCode", codeListValue="creation").text = "Criacao"	
     abstract = ET.SubElement(MD_DataIdentification, "gmd:abstract")
@@ -86,11 +86,14 @@ def write_metadata(outputfile,productid,product):
     credit = ET.SubElement(MD_DataIdentification, "gmd:credit")
     ET.SubElement(credit, "gco:CharacterString").text = default_credit	
     spatialRepresentationType = ET.SubElement(MD_DataIdentification, "gmd:spatialRepresentationType")
-    ET.SubElement(spatialRepresentationType, "gmd:MD_SpatialRepresentationTypeCode", codeList="#MD_SpatialRepresentationTypeCode", codeListValue="grid").text = "Matricial"		
+    ET.SubElement(spatialRepresentationType, "gmd:MD_SpatialRepresentationTypeCode", codeList="#MD_SpatialRepresentationTypeCode", codeListValue="grid").text = "Raster"		
     spatialResolution = ET.SubElement(MD_DataIdentification, "gmd:spatialResolution")
     MD_Resolution = ET.SubElement(spatialResolution, "gmd:MD_Resolution")
     distance = ET.SubElement(MD_Resolution, "gmd:distance")	
     ET.SubElement(distance, "gco:Distance", uom="meters").text = "30"
+    MinimumMappingUnit = ET.SubElement(MD_DataIdentification, "gmd:MinimumMappingUnit")
+    mmu = ET.SubElement(MinimumMappingUnit, "gmd:area")	
+    ET.SubElement(mmu, "gco:MinimumMappingUnit", uom="hectares").text = gen_mmu	
     extent = ET.SubElement(MD_DataIdentification, "gmd:extent")
     EX_Extent = ET.SubElement(extent, "gmd:EX_Extent")
     geographicElement = ET.SubElement(EX_Extent, "gmd:geographicElement")	
@@ -118,6 +121,7 @@ def write_metadata(outputfile,productid,product):
     lineage = ET.SubElement(DQ_DataQuality, "gmd:lineage")
     LI_Lineage = ET.SubElement(lineage, "gmd:LI_Lineage")
     statement = ET.SubElement(LI_Lineage, "gmd:statement")
-    ET.SubElement(statement, "gco:CharacterString").text = "Imagem resultante do mosaico de fotografia"	
+    ET.SubElement(statement, "gco:CharacterString").text = WetSeason
+    ET.SubElement(statement, "gco:CharacterString").text = DrySeason		
     tree = ET.ElementTree(root)
     tree.write(outputfile)
