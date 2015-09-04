@@ -549,7 +549,12 @@ def main():
                 grass.run_command("r.out.gdal", input=mosaic_name, output=mosaic_tif_name, overwrite=True)								
 				    
         #SEGMENTATION AND INTEGRATION OF LULC
-        if perform_segmentation=="yes":		
+        if perform_segmentation=="yes":
+            if replace_maps=='yes':
+                try:
+                    remove_shapefile(vect_out)
+                except OSError:
+                    pass                			
             grass.message(_("Segmenting LULC raster map..."))           
             if len(generatedgenlulc)>=1:
                 for lulcmap in generatedgenlulc:	
@@ -557,6 +562,7 @@ def main():
                     vect_out=lulcmaptif.replace('.tif', '_segm.shp')
                     mask=lulcmaptif.replace('.tif', '_mask.tif')
                     output_stats=lulcmaptif.replace('.tif', '_sts')
+                    summary_table=output_stats+'_summary.csv'
                     driver = ogr.GetDriverByName('ESRI Shapefile')
                     dataSource = driver.Open(vect_out, 0)	
                     #Segmentation			
@@ -564,27 +570,23 @@ def main():
                         grass.message(_("Segmented map already exists. Skipping the segmentation process..."))
                     else:   
                         #create a mask
-                        try:
-                            with open(mask) as f: pass
-                        except:					
-                            subprocess.call('gdal_calc.py -A ' + lulcmaptif + ' --A_band 1 --outfile=' + mask + ' --calc="A>0" --overwrite', shell=True)
+                        subprocess.call('gdal_calc.py -A ' + lulcmaptif + ' --A_band 1 --outfile=' + mask + ' --calc="A>0" --overwrite', shell=True)
                         #perform segmentation GRASS 7
         #                 grass.run_command("i.segment", group='te', output='lixolcover_sgm', threshold='0.6', minsize=minsize)
                         #perform segmentation		
                         s=otbsegmentation(lulcmaptif,mask,spatialr,maxiter,ranger,threshold,minsize,tilesize,simplify,vect_out)
     			        #clean vector in grass
                         grass.message(_("Cleaning segments in GRASS..."))
-                        checksegm = grass.find_file(element = 'vector', name = lulcmap+'_segm')
-                        if checksegm.get('fullname')=='':
-                              grass.run_command("v.in.ogr", dsn=vect_out, output=lulcmap+'_segm', snap='0.0002')
+                        #checksegm = grass.find_file(element = 'vector', name = lulcmap+'_segm')
+                        grass.run_command("v.in.ogr", dsn=vect_out, output=lulcmap+'_segm', snap='0.0002', overwrite=True)
                         try:
                             with open(vect_out) as f: pass
                             remove_shapefile(vect_out)
                             grass.run_command("v.out.ogr", input=lulcmap+'_segm', type='area', dsn=vect_out)				
                         except: 
             				grass.message(_("Skipping cleaning segments..."))
-                        dataSource='exists'					
-                    summary_table=output_stats+'_summary.csv'
+                        dataSource='exists'
+                        os.remove(summary_table) if os.path.exists(summary_table) else None							
                     if os.path.exists(summary_table)==False and dataSource!=None:		
                         #integrate raster values in segments
                         grass.message(_("Integrating segments and raster LULC values..."))
