@@ -164,10 +164,19 @@ def generalize_lulc(lulcmap,gen_lulcmap,mmu,skipmajfilter,method):
         lulc_cells=int(stats_map.split()[0].split('=')[1])	
         grass.run_command("g.copy",rast=(lulcmap,'tempmap'), overwrite=True)
         diff_cells=15
+        clumps=0
+        clumps_p=1		
         count=1
         while diff_cells>0.5:
             grass.run_command("r.neighbors",input='tempmap', output='temp_t0', size=3, method='mode', overwrite=True)
-            grass.run_command("r.reclass.area", input='temp_t0', output='temp_t1', lesser=mmu, overwrite=True)
+            if clumps==clumps_p:
+                break
+            else:
+                clumps=clumps_p			
+            #p=grass.run_command("r.reclass.area", input='temp_t0', output='temp_t1', lesser=mmu, overwrite=True)
+            p=subprocess.Popen(["r.reclass.area", 'input=temp_t0', 'output=temp_t1', 'lesser='+str(mmu), '--overwrite'],stdout=subprocess.PIPE, stderr=subprocess.STDOUT,close_fds=True)
+            t=p.stdout.read()
+            clumps_p=int(t[t.find('r.clump complete.')+17:t.find('clumps')].strip())
             count=count+1.5
             grass.run_command('g.region', rast=lulcmap, res=(0.0003164*count))
             grass.run_command("g.copy",rast=('temp_t1','temp_t2'), overwrite=True)
@@ -176,7 +185,7 @@ def generalize_lulc(lulcmap,gen_lulcmap,mmu,skipmajfilter,method):
             grass.run_command("r.patch", input='temp_t2,temp_t3', output='tempmap', overwrite=True)
             stats_gen=grass.read_command('r.univar', map='temp_t3', flags='g')
             gen_cells=int(stats_gen.split()[0].split('=')[1])
-            diff_cells=float(lulc_cells-gen_cells)/float(lulc_cells)*100
+            diff_cells=float(lulc_cells-gen_cells)/float(lulc_cells)*100			
         grass.run_command("r.neighbors",input='tempmap', output='temp_t0', size=3, method='mode', overwrite=True)			
         grass.mapcalc("$output= if(isnull($mask),null(),$input)", output=gen_lulcmap, input='temp_t0', mask=lulcmap, overwrite=True)
         color_path= os.path.join('/application','symbology','color','dwecolor') 
@@ -550,21 +559,23 @@ def main():
 				    
         #SEGMENTATION AND INTEGRATION OF LULC
         if perform_segmentation=="yes":
-            if replace_maps=='yes':
-                try:
-                    remove_shapefile(vect_out)
-                except OSError:
-                    pass                			
             grass.message(_("Segmenting LULC raster map..."))           
             if len(generatedgenlulc)>=1:
                 for lulcmap in generatedgenlulc:	
                     #Define variables for next steps
+                    gen_lulcmap= lulcmap.strip()
+                    lulcmaptif=os.path.join(non_grass_outputpath,gen_lulcmap+'.tif')					
                     vect_out=lulcmaptif.replace('.tif', '_segm.shp')
                     mask=lulcmaptif.replace('.tif', '_mask.tif')
                     output_stats=lulcmaptif.replace('.tif', '_sts')
                     summary_table=output_stats+'_summary.csv'
                     driver = ogr.GetDriverByName('ESRI Shapefile')
-                    dataSource = driver.Open(vect_out, 0)	
+                    dataSource = driver.Open(vect_out, 0)
+                    if replace_maps=='yes':
+                        try:
+                            remove_shapefile(vect_out)
+                        except OSError:
+                            pass  
                     #Segmentation			
                     if dataSource!=None:
                         grass.message(_("Segmented map already exists. Skipping the segmentation process..."))
