@@ -271,6 +271,7 @@ def main():
     tilesize = data.tilesize
     replace_maps = data.replace_maps
     replace_images = data.replace_images
+    del_images = data.del_images
     simplify = data.simplify
     skiptrainningdataverif = data.skiptrainningdataverif
     non_grass_outputpath = data.non_grass_outputpath
@@ -534,6 +535,12 @@ def main():
                     ciop.publish(errormatrix, metalink = True)					
                 except:
                     grass.message("No testmap was found!")
+					
+            if del_images=='yes':		
+                for i in ['band1','band2','band3','band4','band5','ndvi','band7']:
+                    remove_existing_grassfiles(name_wet.replace('band',i))
+                    remove_existing_grassfiles(name_dry.replace('band',i))				
+		
 						
         #CREATE A MOSAIC OF ALL LULC SCEENES
         mosaic_layers = get_lulc_files(mapset, data.output+'*'+y+"*_LULC")
@@ -648,6 +655,8 @@ def main():
                     grass.run_command("g.remove", flags = "f", quiet=True, rast=temp)					
         else:
             grass.message(_("No available LULC maps where found to generate LULC changes map in tile " + t))
+		
+
       
     #calculate and print total processing time
     endtime=datetime.datetime.now()		
