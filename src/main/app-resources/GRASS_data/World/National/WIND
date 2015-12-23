@@ -1,18 +1,18 @@
 proj:       3
 zone:       0
-north:      41:18:17.397739N
+north:      40:20:56.386619N
 south:      39:20:56.386619N
 east:       7:04:54.287309W
 west:       9:55:11.195152W
 cols:       8924
 rows:       6150
 e-w resol:  0:00:01.14488
-n-s resol:  0:00:01.14488
+n-s resol:  0:00:00.585366
 top:        1.000000000000000
 bottom:     0.000000000000000
 cols3:      8924
-rows3:      6150
+rows3:      3144
 depths:     1
 e-w resol3: 0:00:01.14488
-n-s resol3: 0:00:01.14488
+n-s resol3: 0:00:01.145038
 t-b resol:  1
