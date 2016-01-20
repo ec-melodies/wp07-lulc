@@ -427,6 +427,11 @@ def main():
                               Lmaxb7=output_l[14], 
                               output=output, 
                               season=season)
+            if del_images=='yes':
+                try:
+                    shutil.rmtree(os.path.join(image_path,img))
+                except:
+                    print "Unable to remove original image files. Continuing process..."
         else:
             print ('Image already in mapset. Skipping import to GRASS...')     
         imported.append(name_in_grass)
