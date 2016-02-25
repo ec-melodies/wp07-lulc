@@ -264,9 +264,11 @@
 						<provide>${project.artifactId}</provide>
 					</provides>
 					<requires>
+						<require>grass = 6.4.4-6.el6</require>
+						<require>wine = 1.6.1-1.el6</require>						
 						<require>miniconda-3.8.3</require>
 						<require>landsat-ldope</require>
-                                                <require>landsat-download</require>
+                        <require>landsat-download</require>
 					</requires>
 				</configuration>
 			</plugin>

@@ -2,8 +2,10 @@
 
 # verify 
 cat /application/main.sh
+
  
 # define variables
+Grassdir=/data/GRASS_data
 Landsat_LDOPE=/opt/Landsat_LDOPE
 Lib=/application/lib
 Bin=/application/bin
@@ -20,9 +22,16 @@ export PATH=$anaconda:$Bin:$Lib:$Extlib:$Landsat_download:$Starspan:$Landsat_LDO
 export PYTHONPATH=$Lib:$anaconda
 export LD_LIBRARY_PATH=/usr/local/lib/otb
 export GDAL_DATA=/application/gdal
- 
-# run the job
-grass64 -text /data/GRASS_data/World/National/
+
+if [ -d "$Grassdir/World/National/" ]; then
+    # run the job
+    echo $Grassdir/World/National/
+    grass64 -text $Grassdir/World/National/
+else
+    echo "---Fetching GRASS_data from S3---"
+    mkdir $Grassdir
+    s3cmd get s3://grass-data --recursive $Grassdir
+fi
 # or
 # grass70 ~/grassdata/nc_spm_08_grass7/user1
  

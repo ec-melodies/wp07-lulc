@@ -19,7 +19,7 @@ def get_user_training_data(link,output,outputpath):
     print 'success downloading'
     zf=zipfile.ZipFile(output)
     zf.extractall(outputpath)
-    print 'success unzipping'	
+    print 'success unzipping'
     for file in glob.glob(os.path.join(outputpath,"subclass*shp")):
         class_file=os.path.splitext(os.path.basename(file))[0]
         grass.run_command("v.in.ogr", dsn=file, output='user_'+class_file, snap='0.0002', overwrite=True, quiet=True)
@@ -27,7 +27,14 @@ def get_user_training_data(link,output,outputpath):
     os.remove(output)
     shutil.rmtree(outputpath)	
     return 1
-
+	
+def upload_to_geoserver(host,username,passw,file):
+    gfile=os.path.basename(file)
+    subprocess.call("curl -v -u \""+username+":"+passw+"\" -XPUT -H \"Content-type:image/tiff\" --data-binary @"+file+" "+host+"/coveragestores/"+gfile[:-4]+"/file.geotiff", shell=True)
+    # curl -u melodies-wp7:changeme -XPUT -H "Content-type: text/tiff" --data-binary @/data/GRASS_data/melodies204033_2000_LULC_gen.tif http://geoserver.melodies.terradue.int/geoserver/rest/workspaces/melodies-wp7/coveragestores/218bb127-f3b1-49b4-a9d3-55cac45e1dc2-melodies204033_2000_LULC_gen/file.geotiff
+    # curl -u melodies-wp7:changeme -v -XPUT -H "Content-Type: application/xml" -d "<coverage><title>melodies204033_2000_LULC_gen</title><enabled>true</enabled><advertised>true</advertised></coverage>"  http://geoserver.melodies.terradue.int/geoserver/rest/workspaces/melodies-wp7/coveragestores/218bb127-f3b1-49b4-a9d3-55cac45e1dc2-melodies204033_2000_LULC_gen/coverages/218bb127-f3b1-49b4-a9d3-55cac45e1dc2-melodies204033_2000_LULC_gen.xml
+	
+	
 def set_region(layer,proj_units,t_srx):
     # Define computational region
     grass.message("Setting computational region...")	
@@ -236,9 +243,63 @@ def read_wps_form(param):
         tiles = tiles.split(',')
 	return tiles
 
+def check_trainning_data(user_training_data,imagelist,image_path,img):
+    #check that there are training sample data for all the images, if not remove images from imagelist 
+	grass.message('\nChecking existing training data for all selected tiles...\n\n')
+	tileiter=''
+	removeimgs=[]
+	if user_training_data==1:
+		all_classes=['user_subclass01','user_subclass02','user_subclass03','user_subclass04','user_subclass05','user_subclass06','user_subclass07','user_subclass08','user_subclass09','user_subclass10','user_subclass11','user_subclass12','user_subclass13','user_subclass14','user_subclass15','user_subclass16','user_subclass17'] 
+	else:		
+		all_classes=['subclass01','subclass02','subclass03','subclass04','subclass05','subclass06','subclass07','subclass08','subclass09','subclass10','subclass11','subclass12','subclass13','subclass14','subclass15','subclass16','subclass17']          
+	for img in imagelist:
+		tiletoremove=0
+		output_l=read_landsat_metadata(image_path,img)
+		tile=output_l[len(output_l)-1]
+		if not tile==tileiter:	
+			info=subprocess.Popen(["gdalinfo", os.path.join(image_path,img,img+'_B1.TIF')], stdout=subprocess.PIPE)
+			outp = info.stdout.read()
+			maxy= outp[outp.find('Upper Right')+57:outp.find('Lower Right')-2]
+			miny= outp[outp.find('Lower Left')+57:outp.find('Upper Right')-2]
+			minx= outp[outp.find('Lower Left')+42:outp.find('Upper Right')-17]
+			maxx= outp[outp.find('Upper Right')+42:outp.find('Lower Right')-17]	
+			minx= minx.replace('d',':').replace('\'',':').replace('"','').replace(' ','0')
+			miny= miny.replace('d',':').replace('\'',':').replace('"','').replace(' ','0')    
+			maxx= maxx.replace('d',':').replace('\'',':').replace('"','').replace(' ','0')    
+			maxy= maxy.replace('d',':').replace('\'',':').replace('"','').replace(' ','0')	
+			grass.run_command("g.region", n=maxy, e=maxx, s=miny, w=minx)
+			grass.run_command("v.in.region", output='region', overwrite=True, quiet=True)
+			featuresinregion=0
+			for trainingclass in all_classes:		
+				grass.run_command("v.select", ainput=trainingclass+'@National', binput='region@National', output='lixo', operator='overlap', quiet=True, flags='tc', overwrite=True)
+				selected=grass.read_command('v.info',map='lixo')		
+				featuresinregion = featuresinregion + int(selected[selected.find('Number of areas:')+16:selected.find('Number of lines:')-7].strip())
+				grass.run_command("g.remove", flags = "f", quiet=True, vect='lixo')
+			grass.message('Number of features within tile bounding box: ' + str(featuresinregion))		
+			if featuresinregion <1:
+				grass.message('Not possible to produce LULC National scale map. No training areas were found in tile '+tile+'. Skipping this tile...')
+				removeimgs.append(img)
+				tiletoremove=1
+			grass.run_command("g.remove", flags = "f", quiet=True, vect='region') 		
+			tileiter=tile
+		if tile==tileiter and tiletoremove==1:
+			removeimgs.append(img)
+
+	if len(set(removeimgs))>0:
+		#imagelist=list(set(imagelist).difference(set(removeimgs)))
+		imagelist=remove_duplicates(set(imagelist).difference(set(removeimgs)))
+		grass.message('Images '+str(remove_duplicates(set(removeimgs)))+' will not be processed due to absence training data')
+	else:
+		grass.message('OK')		
+	if len(imagelist)<2:
+		sys.exit("Two seasons must be available for each year and each image tile. Exiting...")
+
 def main():
     #get start time
     starttime=datetime.datetime.now()
+	
+    #reset region to default
+    grass.run_command("g.region", flags='d')
     
     #READ VARIABLES
     ciop = cioppy.Cioppy()
@@ -278,15 +339,14 @@ def main():
     log_path=data.log_path
     mosaic=data.mosaic
     perform_segmentation=data.perform_segmentation
+    host=data.host
+    username=data.username
+    passw=data.passw
+    store=data.store	
     filelist=non_grass_outputpath + '/filelist.txt'
     link = ciop.getparam('User_training_data')
     parts = urlparse.urlsplit(link)
-    if not parts.scheme or not parts.netloc: 
-        user_training_data=0
-    else:		
-        user_training_data = get_user_training_data(link,os.path.join(non_grass_outputpath,'utd.zip'),os.path.join(non_grass_outputpath,'utd'))
-        if user_training_data==1:
-            replace_maps='yes' 
+
  
     #Setup Grass GISbase, GISdbase, location and mapset
     gsetup.init(gisbase,
@@ -329,58 +389,12 @@ def main():
         grass.message('OK')
     if len(imagelist)<2:
         sys.exit("Two seasons must be available for each year and each image tile. Exiting...")
-    
+		
     #check that there are training sample data for all the images, if not remove images from imagelist
     if skiptrainningdataverif=='No':
-        grass.message('\nChecking existing training data for all selected tiles...\n\n')
-        tileiter=''
-        removeimgs=[]
-        if user_training_data==1:
-            all_classes=['user_subclass01','user_subclass02','user_subclass03','user_subclass04','user_subclass05','user_subclass06','user_subclass07','user_subclass08','user_subclass09','user_subclass10','user_subclass11','user_subclass12','user_subclass13','user_subclass14','user_subclass15','user_subclass16','user_subclass17'] 
-        else:		
-            all_classes=['subclass01','subclass02','subclass03','subclass04','subclass05','subclass06','subclass07','subclass08','subclass09','subclass10','subclass11','subclass12','subclass13','subclass14','subclass15','subclass16','subclass17']          
-        for img in imagelist:
-            tiletoremove=0
-            output_l=read_landsat_metadata(image_path,img)
-            tile=output_l[len(output_l)-1]
-            if not tile==tileiter:	
-                info=subprocess.Popen(["gdalinfo", os.path.join(image_path,img,img+'_B1.TIF')], stdout=subprocess.PIPE)
-                outp = info.stdout.read()
-                maxy= outp[outp.find('Upper Right')+57:outp.find('Lower Right')-2]
-                miny= outp[outp.find('Lower Left')+57:outp.find('Upper Right')-2]
-                minx= outp[outp.find('Lower Left')+42:outp.find('Upper Right')-17]
-                maxx= outp[outp.find('Upper Right')+42:outp.find('Lower Right')-17]	
-                minx= minx.replace('d',':').replace('\'',':').replace('"','').replace(' ','0')
-                miny= miny.replace('d',':').replace('\'',':').replace('"','').replace(' ','0')    
-                maxx= maxx.replace('d',':').replace('\'',':').replace('"','').replace(' ','0')    
-                maxy= maxy.replace('d',':').replace('\'',':').replace('"','').replace(' ','0')	
-                grass.run_command("g.region", n=maxy, e=maxx, s=miny, w=minx)
-                grass.run_command("v.in.region", output='region', overwrite=True, quiet=True)
-                featuresinregion=0
-                for trainingclass in all_classes:		
-                    grass.run_command("v.select", ainput=trainingclass+'@National', binput='region@National', output='lixo', operator='overlap', quiet=True, flags='tc', overwrite=True)
-                    selected=grass.read_command('v.info',map='lixo')		
-                    featuresinregion = featuresinregion + int(selected[selected.find('Number of areas:')+16:selected.find('Number of lines:')-7].strip())
-                    grass.run_command("g.remove", flags = "f", quiet=True, vect='lixo')
-                grass.message('Number of features within tile bounding box: ' + str(featuresinregion))		
-                if featuresinregion <1:
-                    grass.message('Not possible to produce LULC National scale map. No training areas were found in tile '+tile+'. Skipping this tile...')
-                    removeimgs.append(img)
-                    tiletoremove=1
-                grass.run_command("g.remove", flags = "f", quiet=True, vect='region') 		
-                tileiter=tile
-            if tile==tileiter and tiletoremove==1:
-                removeimgs.append(img)
-    
-        if len(set(removeimgs))>0:
-            #imagelist=list(set(imagelist).difference(set(removeimgs)))
-            imagelist=remove_duplicates(set(imagelist).difference(set(removeimgs)))
-            grass.message('Images '+str(remove_duplicates(set(removeimgs)))+' will not be processed due to absence training data')
-        else:
-            grass.message('OK')		
-        if len(imagelist)<2:
-            sys.exit("Two seasons must be available for each year and each image tile. Exiting...")
-    
+        user_training_data=0
+        check_trainning_data(user_training_data,imagelist,image_path,img)	
+		
     #IMPORT AND PRE-PROCESS LANDSAT IMAGES FROM imagelist
     imported=[]
     yearofimportedimgs=[]  
@@ -456,12 +470,10 @@ def main():
                 remove_existing_grassfiles(output+'_LULC@'+mapset)
                 remove_existing_grassfiles(output+'_LULC_gen@'+mapset)
                 remove_existing_grassfiles(output+'_LULCtestmap@'+mapset)				
-            # print imported    #DEBUG
             valid_seasons_imgs=0
             name_dry = None
             name_wet = None		
             for imported_img in imported:
-                # print imported_img	   #DEBUG
                 print str(valid_seasons_imgs)
                 if imported_img.find('Dry')>=0 and imported_img.find(t)>=0 and imported_img.find(y)>=0 and name_dry == None:
                         name_dry=imported_img
@@ -472,9 +484,17 @@ def main():
             fu = grass.find_file(element = 'cell', name = output+'_LULC@'+mapset)
             if valid_seasons_imgs>=2 and fu.get('fullname')=='':	
                 #SET REGION
-                set_region(name_wet.replace('band','band1'),'','')		
+                set_region(name_wet.replace('band','band1'),'','')
                 #CLOUD FILL
-                cloudfill(data.output,y,t,log_path)		
+                cloudfill(data.output,y,t,log_path)					
+                #IMPORT USER TRAINING SAMPLES IF EXIST
+                if not parts.scheme or not parts.netloc: 
+                    user_training_data=0
+                else:		
+                    user_training_data = get_user_training_data(link,os.path.join(non_grass_outputpath,'utd.zip'),os.path.join(non_grass_outputpath,'utd'))
+                    if user_training_data==1:
+                        replace_maps='yes'
+						
                 #CLASSIFY
                 p=grass.read_command("i.lulc.national.py", 
                                   input1st=[name_wet.replace('band','band1'), 
@@ -531,7 +551,9 @@ def main():
                 #Check if tif already on disk				
                 grass.run_command("r.out.gdal", input=gen_lulcmap, output=lulcmaptif, overwrite=True)
                 write_metadata(lulcmaptif.replace('.tif','_metadata.xml'),gen_lulcmap,lulcmaptif,name_dry,name_wet,MMU)		
-                ciop.publish(lulcmaptif, metalink = True)					
+                ciop.publish(lulcmaptif, metalink = True)		
+                ciop.publish(lulcmaptif.replace('.tif','_metadata.xml'), metalink = True)
+                upload_to_geoserver(host,username,passw,lulcmaptif)				
                 generatedlulctifs.append(lulcmaptif)
                 #ACCURACY ASSESSMENT			
                 errormatrix=os.path.join(non_grass_outputpath,lulcmap.strip()+'_errormatrix')
