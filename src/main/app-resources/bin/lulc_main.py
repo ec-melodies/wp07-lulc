@@ -28,12 +28,15 @@ def get_user_training_data(link,output,outputpath):
     shutil.rmtree(outputpath)	
     return 1
 	
-def upload_to_geoserver(host,username,passw,file):
+def upload_to_geoserver(host,workspace,username,passw,file,jobid):
     gfile=os.path.basename(file)
-    subprocess.call("curl -v -u \""+username+":"+passw+"\" -XPUT -H \"Content-type:image/tiff\" --data-binary @"+file+" "+host+"/coveragestores/"+gfile[:-4]+"/file.geotiff", shell=True)
-    # curl -u melodies-wp7:changeme -XPUT -H "Content-type: text/tiff" --data-binary @/data/GRASS_data/melodies204033_2000_LULC_gen.tif http://geoserver.melodies.terradue.int/geoserver/rest/workspaces/melodies-wp7/coveragestores/218bb127-f3b1-49b4-a9d3-55cac45e1dc2-melodies204033_2000_LULC_gen/file.geotiff
-    # curl -u melodies-wp7:changeme -v -XPUT -H "Content-Type: application/xml" -d "<coverage><title>melodies204033_2000_LULC_gen</title><enabled>true</enabled><advertised>true</advertised></coverage>"  http://geoserver.melodies.terradue.int/geoserver/rest/workspaces/melodies-wp7/coveragestores/218bb127-f3b1-49b4-a9d3-55cac45e1dc2-melodies204033_2000_LULC_gen/coverages/218bb127-f3b1-49b4-a9d3-55cac45e1dc2-melodies204033_2000_LULC_gen.xml
-	
+    if gfile.find("LUC")>=0:
+        style="lucc"
+    else:
+        style="lulc"
+    subprocess.call("curl -v -u \""+username+":"+passw+"\" -XPUT -H \"Content-type:image/tiff\" --data-binary @"+file+" "+host+"/workspaces/"+workspace+"/coveragestores/"+jobid+"--"+gfile[:-9]+"/file.geotiff", shell=True)
+    subprocess.call("curl -v -u \""+username+":"+passw+"\" -XPUT -H \"Content-type:application/xml\" -d \"<coverage><title>"+gfile[:-9]+"</title><enabled>true</enabled><advertised>true</advertised></coverage>\" "+host+"/workspaces/"+workspace+"/coveragestores/"+jobid+"--"+gfile[:-9]+"/coverages/"+jobid+"--"+gfile[:-9]+".xml", shell=True)
+    subprocess.call("curl -v -u \""+username+":"+passw+"\" -XPUT -H \"Content-type:application/xml\" -d \"<layer><defaultStyle><name>"+workspace+":"+style+"</name></defaultStyle><enabled>false</enabled><styles><style><name>raster</name></style><style><name>raster</name></style></styles><advertised>true</advertised></layer>\" "+host+"/layers/"+jobid+"--"+gfile[:-9]+".xml", shell=True)
 	
 def set_region(layer,proj_units,t_srx):
     # Define computational region
@@ -302,6 +305,7 @@ def main():
     grass.run_command("g.region", flags='d')
     
     #READ VARIABLES
+    jobid=os.environ['_WF_ID']
     ciop = cioppy.Cioppy()
     dirname=os.path.dirname
     appdir=os.path.abspath(os.path.join(os.path.dirname(__file__),".."))
@@ -340,6 +344,7 @@ def main():
     mosaic=data.mosaic
     perform_segmentation=data.perform_segmentation
     host=data.host
+    workspace=data.workspace	
     username=data.username
     passw=data.passw
     store=data.store	
@@ -532,7 +537,9 @@ def main():
                 set_region(lulcmap,'','30')
                 #define file names for the following steps				
                 gen_lulcmap= lulcmap.strip()+'_gen'
-                lulcmaptif=os.path.join(non_grass_outputpath,gen_lulcmap+'.tif')			
+                gen_lulcmap_grey= lulcmap.strip()+'_gen_grey'				
+                lulcmaptif=os.path.join(non_grass_outputpath,gen_lulcmap+'.tif')
+                lulcmaptif_grey=os.path.join(non_grass_outputpath,gen_lulcmap_grey+'.tif')				
                 testmap=lulcmap+'testmap'
                 #Generalization				
                 #print all_gens.get(lulcmap)	#DEBUG
@@ -550,10 +557,13 @@ def main():
 		        #EXPORT LULC MAP OUT OF GRASS
                 #Check if tif already on disk				
                 grass.run_command("r.out.gdal", input=gen_lulcmap, output=lulcmaptif, overwrite=True)
+                grass.run_command('r.colors', map = gen_lulcmap, color="grey", quiet=True)	
+                #grass.run_command("r.out.gdal", input=gen_lulcmap, output=lulcmaptif, overwrite=True)	
+                grass.run_command("r.out.gdal", input=gen_lulcmap, output=lulcmaptif_grey, overwrite=True)					
                 write_metadata(lulcmaptif.replace('.tif','_metadata.xml'),gen_lulcmap,lulcmaptif,name_dry,name_wet,MMU)		
                 ciop.publish(lulcmaptif, metalink = True)		
                 ciop.publish(lulcmaptif.replace('.tif','_metadata.xml'), metalink = True)
-                upload_to_geoserver(host,username,passw,lulcmaptif)				
+                upload_to_geoserver(host,workspace,username,passw,lulcmaptif_grey,jobid)				
                 generatedlulctifs.append(lulcmaptif)
                 #ACCURACY ASSESSMENT			
                 errormatrix=os.path.join(non_grass_outputpath,lulcmap.strip()+'_errormatrix')
@@ -660,7 +670,9 @@ def main():
                 lulcchangesreclass= data.output+t+'_'+min(yearofimportedimgs)+'_to_'+max(yearofimportedimgs)+'_LUCCreclass'
                 temp='temp'		
                 lulcchangesgen= data.output+t+'_'+min(yearofimportedimgs)+'_to_'+max(yearofimportedimgs)+'_LUCCgen'
-                lulcchangestif=non_grass_outputpath+'/'+lulcchangesgen+'.tif'	
+                #lulcchangestif=non_grass_outputpath+'/'+lulcchangesgen+'.tif'
+                lulcchangestif=os.path.join(non_grass_outputpath,lulcchangesgen,'.tif')					
+                lulcchangestif_grey=lulcchangestif=os.path.join(non_grass_outputpath,lulcchangesgen,'_grey.tif')						
                 #check if file already exists			
                 try:
                     with open(lulcchangestif) as f: pass
@@ -676,7 +688,11 @@ def main():
                     applycolormap(color_path, lulcchangesgen, gisbase)
                     #export to tif			
                     grass.run_command("r.out.gdal", input=lulcchangesgen, output=lulcchangestif, type='Byte')
+					#publish to ciop and geoserver
                     ciop.publish(lulcchangestif, metalink = True)
+                    grass.run_command('r.colors', map = lulcchangesgen, color="grey", quiet=True)	
+                    grass.run_command("r.out.gdal", input=lulcchangesgen, output=lulcchangestif_grey, overwrite=True)	
+                    upload_to_geoserver(host,workspace,username,passw,lulcchangestif_grey,jobid)						
                     #remove temp files
                     grass.run_command("g.remove", flags = "f", quiet=True, rast=lulcchanges)				
                     grass.run_command("g.remove", flags = "f", quiet=True, rast=temp)					
