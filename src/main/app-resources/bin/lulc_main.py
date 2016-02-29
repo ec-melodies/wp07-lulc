@@ -31,7 +31,7 @@ def get_user_training_data(link,output,outputpath):
 def upload_to_geoserver(host,workspace,username,passw,file,jobid):
     gfile=os.path.basename(file)
     if gfile.find("LUC")>=0:
-        style="lucc"
+        style="lulc_changes"
     else:
         style="lulc"
     subprocess.call("curl -v -u \""+username+":"+passw+"\" -XPUT -H \"Content-type:image/tiff\" --data-binary @"+file+" "+host+"/workspaces/"+workspace+"/coveragestores/"+jobid+"--"+gfile[:-9]+"/file.geotiff", shell=True)
@@ -670,9 +670,10 @@ def main():
                 lulcchangesreclass= data.output+t+'_'+min(yearofimportedimgs)+'_to_'+max(yearofimportedimgs)+'_LUCCreclass'
                 temp='temp'		
                 lulcchangesgen= data.output+t+'_'+min(yearofimportedimgs)+'_to_'+max(yearofimportedimgs)+'_LUCCgen'
-                #lulcchangestif=non_grass_outputpath+'/'+lulcchangesgen+'.tif'
-                lulcchangestif=os.path.join(non_grass_outputpath,lulcchangesgen,'.tif')					
-                lulcchangestif_grey=lulcchangestif=os.path.join(non_grass_outputpath,lulcchangesgen,'_grey.tif')						
+                lulcchangestif=non_grass_outputpath+'/'+lulcchangesgen+'.tif'
+                lulcchangestif_grey=non_grass_outputpath+'/'+lulcchangesgen+'_grey.tif'				
+                # lulcchangestif=os.path.join(non_grass_outputpath,lulcchangesgen,'.tif')					
+                # lulcchangestif_grey=os.path.join(non_grass_outputpath,lulcchangesgen,'_grey.tif')						
                 #check if file already exists			
                 try:
                     with open(lulcchangestif) as f: pass
