@@ -556,10 +556,12 @@ def main():
                     generatedgenlulc.append(gen_lulcmap)
 		        #EXPORT LULC MAP OUT OF GRASS
                 #Check if tif already on disk				
-                grass.run_command("r.out.gdal", input=gen_lulcmap, output=lulcmaptif, overwrite=True)
                 grass.run_command('r.colors', map = gen_lulcmap, color="grey", quiet=True)	
-                #grass.run_command("r.out.gdal", input=gen_lulcmap, output=lulcmaptif, overwrite=True)	
-                grass.run_command("r.out.gdal", input=gen_lulcmap, output=lulcmaptif_grey, overwrite=True)					
+                grass.run_command("r.out.gdal", input=gen_lulcmap, output=lulcmaptif_grey, overwrite=True)				
+                lulc_color_path= os.path.join('/application','symbology','color','dwecolor') 
+                grass.run_command('r.colors', map = gen_lulcmap, rules = lulc_color_path, quiet=True)
+                grass.run_command("r.out.gdal", input=gen_lulcmap, output=lulcmaptif, overwrite=True)				
+				#PUBLISH DATA
                 write_metadata(lulcmaptif.replace('.tif','_metadata.xml'),gen_lulcmap,lulcmaptif,name_dry,name_wet,MMU)		
                 ciop.publish(lulcmaptif, metalink = True)		
                 ciop.publish(lulcmaptif.replace('.tif','_metadata.xml'), metalink = True)
