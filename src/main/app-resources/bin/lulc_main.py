@@ -554,26 +554,36 @@ def main():
                         generatedlulc.remove(lulcmap)	
                 else:
                     generatedgenlulc.append(gen_lulcmap)
-		        #EXPORT LULC MAP OUT OF GRASS
-                #Check if tif already on disk				
-                grass.run_command('r.colors', map = gen_lulcmap, color="grey", quiet=True)	
-                grass.run_command("r.out.gdal", input=gen_lulcmap, output=lulcmaptif_grey, overwrite=True)				
-                lulc_color_path= os.path.join('/application','symbology','color','dwecolor') 
-                grass.run_command('r.colors', map = gen_lulcmap, rules = lulc_color_path, quiet=True)
-                grass.run_command("r.out.gdal", input=gen_lulcmap, output=lulcmaptif, overwrite=True)				
-				#PUBLISH DATA
-                write_metadata(lulcmaptif.replace('.tif','_metadata.xml'),gen_lulcmap,lulcmaptif,name_dry,name_wet,MMU)		
-                ciop.publish(lulcmaptif, metalink = True)		
-                ciop.publish(lulcmaptif.replace('.tif','_metadata.xml'), metalink = True)
-                upload_to_geoserver(host,workspace,username,passw,lulcmaptif_grey,jobid)				
-                generatedlulctifs.append(lulcmaptif)
                 #ACCURACY ASSESSMENT			
                 errormatrix=os.path.join(non_grass_outputpath,lulcmap.strip()+'_errormatrix')
                 try:			
-                    p=grass.run_command("r.kappa", classification=lulcmap, reference=testmap, output=errormatrix, overwrite=True)
-                    ciop.publish(errormatrix, metalink = True)					
+                    p_aa=grass.run_command("r.kappa", classification=lulcmap, reference=testmap, output=errormatrix, overwrite=True)					
                 except:
-                    grass.message("No testmap was found!")
+                    grass.message("No testmap was found!")					
+		        #EXPORT LULC MAP OUT OF GRASS
+                #Check if tif already on disk
+                publish_lulc='no'
+                if replace_maps=='yes':		
+                    publish_lulc='yes'
+                else:
+                    try:
+                        with open(lulcmaptif) as f: pass
+                    except:
+                        publish_lulc='yes'					
+                if publish_lulc=='yes':	
+                    grass.run_command('r.colors', map = gen_lulcmap, color="grey", quiet=True)	
+                    grass.run_command("r.out.gdal", input=gen_lulcmap, output=lulcmaptif_grey, overwrite=True)				
+                    lulc_color_path= os.path.join('/application','symbology','color','dwecolor') 
+                    grass.run_command('r.colors', map = gen_lulcmap, rules = lulc_color_path, quiet=True)
+                    grass.run_command("r.out.gdal", input=gen_lulcmap, output=lulcmaptif, overwrite=True)				
+			    	#PUBLISH DATA
+                    write_metadata(lulcmaptif.replace('.tif','_metadata.xml'),gen_lulcmap,lulcmaptif,name_dry,name_wet,MMU)		
+                    ciop.publish(lulcmaptif, metalink = True)		
+                    ciop.publish(lulcmaptif.replace('.tif','_metadata.xml'), metalink = True)
+                    if p_aa==0:
+                        ciop.publish(errormatrix, metalink = True)					
+                    upload_to_geoserver(host,workspace,username,passw,lulcmaptif_grey,jobid)				
+                    generatedlulctifs.append(lulcmaptif)
 					
             if del_images=='yes':		
                 for i in ['band1','band2','band3','band4','band5','ndvi','band7']:
@@ -676,10 +686,16 @@ def main():
                 lulcchangestif_grey=non_grass_outputpath+'/'+lulcchangesgen+'_grey.tif'				
                 # lulcchangestif=os.path.join(non_grass_outputpath,lulcchangesgen,'.tif')					
                 # lulcchangestif_grey=os.path.join(non_grass_outputpath,lulcchangesgen,'_grey.tif')						
-                #check if file already exists			
-                try:
-                    with open(lulcchangestif) as f: pass
-                except:
+                #check if file already exists
+                publish_lucc='no'				
+                if replace_maps=='yes':
+                    publish_lucc='yes'
+                else:					
+                    try:
+                        with open(lulcchangestif) as f: pass
+                    except:
+                        publish_lucc='yes'					
+                if publish_lucc=='yes':					
                     grass.message(("Generating change detection map with: " + str(start_lulc) + " and: " + str(end_lulc)))
                     #calculate and clean
                     p=grass.mapcalc("$out=if($B1==$B2,null(),$B1*2324+$B2*12)", out=lulcchanges, B1=start_lulc, B2=end_lulc)
