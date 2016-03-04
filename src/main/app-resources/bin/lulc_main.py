@@ -314,7 +314,9 @@ def main():
     gisbase = data.gisbase
     gisdbase = data.gisdbase
     location = data.location
-    fetchtiles = read_wps_form('tiles')
+    fetchtiles = sys.argv[1]
+    print "Running tile(s): "+ fetchtiles 
+    #fetchtiles = read_wps_form('tiles')
     years = read_wps_form('years')
     mapset   = data.mapset
     image_path=data.image_path
