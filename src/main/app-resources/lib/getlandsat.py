@@ -47,7 +47,7 @@ def checkseasonimg(year,season,tile,dir):
         return None
 
 
-def getlandsats(years,tiles,admitedcloudcover,outputdir,outputcatalogs,credentialsfile):
+def getlandsats(years,tiles,admitedcloudcover,outputdir,outputcatalogs,credentialsfile,proxy_path):
     if admitedcloudcover==None:
         admitedcloudcover=''
     else:
@@ -73,7 +73,11 @@ def getlandsats(years,tiles,admitedcloudcover,outputdir,outputcatalogs,credentia
                     startdate=year+season.split('-')[0]
                     enddate=year+season.split('-')[1]
                     print "Search interval: " + startdate + " to " +enddate + " - Bird: " + bird
-                    subprocess.call('download_landsat_scene.py -z unzip -b '+bird+' -o catalog -d '+startdate+' -f '+enddate+admitedcloudcover+' -k noupdate -s '+tile+' -u '+credentialsfile+' --output '+outputdir+' --outputcatalogs '+outputcatalogs, shell=True)
+                    if os.path.isfile(proxy_path)==True:
+                        subprocess.call('download_landsat_scene.py -z unzip -b '+bird+' -o catalog -d '+startdate+' -f '+enddate+admitedcloudcover+' -k noupdate -s '+tile+' -u '+credentialsfile+' -p '+proxy_path+' --output '+outputdir+' --outputcatalogs '+outputcatalogs, shell=True)
+                        # print 'download_landsat_scene.py -z unzip -b '+bird+' -o catalog -d '+startdate+' -f '+enddate+admitedcloudcover+' -k noupdate -s '+tile+' -u '+credentialsfile+' -p '+proxy_path+' --output '+outputdir+' --outputcatalogs '+outputcatalogs						
+                    else:					
+                        subprocess.call('download_landsat_scene.py -z unzip -b '+bird+' -o catalog -d '+startdate+' -f '+enddate+admitedcloudcover+' -k noupdate -s '+tile+' -u '+credentialsfile+' --output '+outputdir+' --outputcatalogs '+outputcatalogs, shell=True)
                     l = open(logfile,'r')
                     images=l.read().translate(None, '\n[]\'')
                     if images!='':		

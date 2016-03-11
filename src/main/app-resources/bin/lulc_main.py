@@ -305,7 +305,7 @@ def main():
     grass.run_command("g.region", flags='d')
     
     #READ VARIABLES
-    jobid=os.environ['_WF_ID']
+    #jobid=os.environ['_WF_ID']
     ciop = cioppy.Cioppy()
     dirname=os.path.dirname
     appdir=os.path.abspath(os.path.join(os.path.dirname(__file__),".."))
@@ -320,16 +320,19 @@ def main():
     years = read_wps_form('years')
     mapset   = data.mapset
     image_path=data.image_path
+    proxy_path=data.proxy_path
     admitedcloudcover = data.admitedcloudcover
     credentialsfile = data.usgscredentialsfile
     imagelist = data.imagelist
     if imagelist=='':
-        imagelist=getlandsats(years,fetchtiles,admitedcloudcover,image_path,image_path,credentialsfile)
+        fetchtiles=fetchtiles.split()
+        imagelist=getlandsats(years,fetchtiles,admitedcloudcover,image_path,image_path,credentialsfile,proxy_path)
     # print imagelist   #DEBUG
     output=data.output
     color_path= os.path.join(dirname(dirname(__file__)),'symbology','data_lulc_trends_legend2d')
     reclass_path= os.path.join(dirname(dirname(__file__)),'symbology','reclass_lucc')
     MMU = ciop.getparam('MMU')
+    jobid = ciop.getparam('JobID')
     spatialr = data.spatialr
     maxiter = data.maxiter
     ranger = data.ranger
@@ -571,7 +574,7 @@ def main():
                     try:
                         with open(lulcmaptif) as f: pass
                     except:
-                        publish_lulc='yes'					
+                        publish_lulc='yes'			
                 if publish_lulc=='yes':	
                     grass.run_command('r.colors', map = gen_lulcmap, color="grey", quiet=True)	
                     grass.run_command("r.out.gdal", input=gen_lulcmap, output=lulcmaptif_grey, overwrite=True)				
