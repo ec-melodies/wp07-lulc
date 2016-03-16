@@ -79,9 +79,9 @@
 							<resources>
 								<resource>
 									<directory>${basedir}/src/main/app-resources/</directory>
-									<excludes>
+									<!--excludes>
 										<exclude>**/GRASS_data/**</exclude>
-									</excludes>
+									</excludes-->
 								</resource>
 							</resources>
 						</configuration>
