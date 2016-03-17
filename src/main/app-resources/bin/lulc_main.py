@@ -352,7 +352,8 @@ def main():
     workspace=data.workspace	
     username=data.username
     passw=data.passw
-    store=data.store	
+    store=data.store
+    republish_to_geoserver=data.republish_to_geoserver	
     filelist=non_grass_outputpath + '/filelist.txt'
     link = ciop.getparam('User_training_data')
     parts = urlparse.urlsplit(link)
@@ -575,7 +576,7 @@ def main():
                         with open(lulcmaptif) as f: pass
                     except:
                         publish_lulc='yes'			
-                if publish_lulc=='yes':	
+                if publish_lulc=='yes' or republish_to_geoserver=='yes':	
                     grass.run_command('r.colors', map = gen_lulcmap, color="grey", quiet=True)	
                     grass.run_command("r.out.gdal", input=gen_lulcmap, output=lulcmaptif_grey, overwrite=True)				
                     lulc_color_path= os.path.join('/application','symbology','color','dwecolor') 
@@ -586,7 +587,7 @@ def main():
                     ciop.publish(lulcmaptif, metalink = True)		
                     ciop.publish(lulcmaptif.replace('.tif','_metadata.xml'), metalink = True)
                     if p_aa==0:
-                        ciop.publish(errormatrix, metalink = True)					
+                        ciop.publish(errormatrix, metalink = True)						
                     upload_to_geoserver(host,workspace,username,passw,lulcmaptif_grey,jobid)				
                     generatedlulctifs.append(lulcmaptif)
 					
@@ -594,8 +595,7 @@ def main():
                 for i in ['band1','band2','band3','band4','band5','ndvi','band7']:
                     remove_existing_grassfiles(name_wet.replace('band',i))
                     remove_existing_grassfiles(name_dry.replace('band',i))				
-		
-						
+
         #CREATE A MOSAIC OF ALL LULC SCEENES
         mosaic_layers = get_lulc_files(mapset, data.output+'*'+y+"*_LULC")
         if len(mosaic_layers)>=2: 		
@@ -700,7 +700,7 @@ def main():
                         with open(lulcchangestif) as f: pass
                     except:
                         publish_lucc='yes'					
-                if publish_lucc=='yes':					
+                if publish_lucc=='yes' or republish_to_geoserver=='yes':					
                     grass.message(("Generating change detection map with: " + str(start_lulc) + " and: " + str(end_lulc)))
                     #calculate and clean
                     p=grass.mapcalc("$out=if($B1==$B2,null(),$B1*2324+$B2*12)", out=lulcchanges, B1=start_lulc, B2=end_lulc)
