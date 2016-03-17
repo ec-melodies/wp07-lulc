@@ -37,10 +37,11 @@ def checkseasonimg(year,season,tile,dir):
     for img in dirs:
         tile_img=img[3:9]		
         year_img=img[9:13]
-        season_img=Calculate_season(img,'Portugal')
-        if year_img==year and season_img==season and tile_img==tile:
-            imagefound=img
-            break
+        if tile_img.isdigit() and year_img.isdigit():
+            season_img=Calculate_season(img,'Portugal')
+            if year_img==year and season_img==season and tile_img==tile:
+                imagefound=img
+                break
     if imagefound!='':
         return imagefound	
     else:
