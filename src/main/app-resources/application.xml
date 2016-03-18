@@ -4,8 +4,8 @@
     <jobTemplate id="my_template">
       <streamingExecutable>/application/ini.sh</streamingExecutable>
       <defaultParameters>
-        <parameter id="years" title="Years" abstract="Set the Years(s) you want to generate" scope="runtime" maxOccurs="1">2000,2010</parameter>
-        <parameter id="MMU" title="MMU" abstract="Set the Minimum Mapping Unit in hectares for your final Land Cover map" scope="runtime" maxOccurs="1">10</parameter>
+        <parameter id="years" title="Years" abstract="Set the Years(s) you want to generate" scope="runtime" maxOccurs="1"></parameter>
+        <parameter id="MMU" title="MMU" abstract="Set the Minimum Mapping Unit in hectares for your final Land Cover map" scope="runtime" maxOccurs="1"></parameter>
         <parameter id="User_training_data" title="User training data" abstract="Paste link to User Training Data zip file" scope="runtime" maxOccurs="1"/>
         <parameter id="JobID" title="JobID" abstract="teste" scope="runtime" maxOccurs="1"/>
       </defaultParameters>
