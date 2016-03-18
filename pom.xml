@@ -131,7 +131,8 @@
 						<configuration>
 							<target>
 								<chmod dir="/application" includes="**/run, **/bin/*, **/*.py, **/*.sh, **/*.exe" perm="755" />
-                						<chmod file="/application/application.xml" perm="664"/>
+								<chmod dir="/data" perm="755" />
+								<chmod file="/application/ini.sh" perm="755"/>								
 							</target>
 						</configuration>
 						<goals>
@@ -218,6 +219,7 @@
 							</sources>
 						</mapping>
 
+
 						<mapping>
 							<directory>/application</directory>
 							<sources>
@@ -227,6 +229,8 @@
 										<include>**/run</include>
 										<include>**/bin*</include>
 										<include>**/*.py</include>
+										<include>**/*.sh</include>
+										<include>**/*.xml</include>
 									</includes>
 								</source>
 							</sources>
@@ -251,7 +255,7 @@
                   							</includes>
                 						</source>
               						</sources>
-              						<filemode>664</filemode>
+              						<filemode>666</filemode>
             					</mapping>
 					</mappings>
 					
@@ -265,10 +269,10 @@
 					</provides>
 					<requires>
 						<require>grass = 6.4.4-6.el6</require>
-						<require>wine = 1.6.1-1.el6</require>						
+						<require>wine</require> 						
 						<require>miniconda-3.8.3</require>
 						<require>landsat-ldope</require>
-                        <require>landsat-download</require>
+                        			<require>landsat-download</require>
 					</requires>
 				</configuration>
 			</plugin>

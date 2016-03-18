@@ -12,7 +12,7 @@ Starspan=/usr/local/starspan/bin/
 anaconda=/opt/anaconda/bin/
  
 # define environment variables
-export executablefile=/application/main.sh
+export executablefile=/data/main.sh
 export Landsat_download=$Landsat_download
 export PATH=$anaconda:$Bin:$Lib:$Extlib:$Landsat_download:$Starspan:$Landsat_LDOPE:$PATH
 export PYTHONPATH=$Lib:$anaconda
@@ -32,6 +32,7 @@ else
     echo "---Fetching GRASS_data from S3---"
     mkdir $Grassdir
     s3cmd get s3://grass-data --recursive $Grassdir
+    grass64 -text $Grassdir/World/National/	
 fi
 
 rm $executablefile
