@@ -2,6 +2,7 @@
 
 # define variables
 Grassdir=/data/GRASS_data
+imagesfld=/data/images
 Landsat_LDOPE=/opt/Landsat_LDOPE
 Lib=/application/lib
 Bin=/application/bin
@@ -19,6 +20,19 @@ export PYTHONPATH=$Lib:$anaconda
 export LD_LIBRARY_PATH=/usr/local/lib/otb
 export GDAL_DATA=/application/gdal
 
+#create images folder and needed files
+mkdir $imagesfld -p
+if [ ! -f $imagesfld/log.txt ]; then
+    echo -e " " > $imagesfld/log.txt
+fi
+if [ ! -f /data/usgs.txt ]; then
+    echo -e "criticalsoftware csw123456" > /data/usgs.txt
+fi
+if [ ! -f /data/proxy.txt ]; then
+    echo -e "Me Security\nasinara.terradue.com\n3128" > /data/proxy.txt
+fi
+
+#run job for each tile
 while read tile; do
 echo -e "#!/bin/sh\npython /application/bin/lulc_main.py ${tile}" > $executablefile
 chmod u+x $executablefile
