@@ -228,6 +228,7 @@
 									<includes>
 										<include>**/run</include>
 										<include>**/bin*</include>
+										<include>**/extlib/*.exe</include>										
 										<include>**/*.py</include>
 										<include>**/*.sh</include>
 										<include>**/*.xml</include>
