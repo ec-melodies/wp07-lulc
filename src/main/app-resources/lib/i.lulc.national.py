@@ -50,7 +50,7 @@
 #%end
 
 import grass.script as grass 
-import sys
+import sys, subprocess
 import os
 
 def main():
@@ -251,7 +251,10 @@ def main():
             #grass.mapcalc("$output= $input", output=t_class, national=national_mask, input=x)		#DEBUG - This skips outlier detection which is crucial  
           #except:
             #p=-1
-          p=grass.run_command("i.outdetect.exe", group=group_name, subgroup="subgroup", overwrite=True, sigfile=x, class_out=t_class, original=x, quiet=True)
+          if sys.platform.startswith('win'):
+             p=grass.run_command("i.outdetect.exe", group=group_name, subgroup="subgroup", overwrite=True, sigfile=x, class_out=t_class, original=x, quiet=True)
+          else:
+             p=subprocess.call(["wine","/application/extlib/i.outdetect.exe", "group="+group_name, "subgroup=subgroup", "sigfile="+x, "class_out="+t_class, "original="+x, "--overwrite", "--quiet"])			
           # p=0		  
           if p!=0:
              eliminate_rastermaps([NDVItemp1,NDVItemp2,"mask_map__t"])	
@@ -357,7 +360,11 @@ def main():
 
     # Apply i.ldc
     grass.message(_("Running Linear Discriminant Classifier..."))
-    p=grass.run_command("i.ldc.exe", group=group_name, subgroup="subgroup", sigfile=group_name, class_out=output_t, overwrite=True, verbose=True)
+    if sys.platform.startswith('win'):
+        p=grass.run_command("i.ldc.exe", group=group_name, subgroup="subgroup", sigfile=group_name, class_out=output_t, overwrite=True, verbose=True)
+    else:
+        p=subprocess.call(["wine","/application/extlib/i.ldc.exe", "group="+group_name, "subgroup=subgroup", "sigfile="+group_name, "class_out="+output_t, "--verbose", "--overwrite"])			
+		
     # p=grass.run_command("i.maxlik", group=group_name, subgroup="subgroup", sigfile=group_name, _class=output_t, overwrite=True, quiet=True)   #DEBUG	
     if p!=0:
        eliminate_rastermaps([NDVItemp1,NDVItemp2,"mask_map__t","trainingmap"])	
