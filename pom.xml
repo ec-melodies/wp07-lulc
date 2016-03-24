@@ -7,7 +7,7 @@
 	<packaging>pom</packaging>
 	<name>wp07-lulc</name>
 	<description>WP07 Desertification Indicators - LULC</description>
-	<version>1.0</version>
+	<version>2.4.0</version>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
