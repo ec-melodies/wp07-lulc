@@ -355,6 +355,7 @@ def main():
     non_grass_outputpath = data.non_grass_outputpath
     log_path=data.log_path
     mosaic=data.mosaic
+    control_replace_maps_from_gs=data.control_replace_maps_from_gs
     perform_segmentation=data.perform_segmentation
     host=data.host
     workspace=data.workspace	
@@ -485,9 +486,10 @@ def main():
         for t in tiles:
             grass.message("Processing image " + str(cont) + " out of " + str(len(tiles)))		
             output=data.output+t+'_'+y
-            checkGS=verifyFileInGeoserver(host,workspace,username,passw,output)
-            if checkGS!='yes':
-                replace_maps='yes'			
+            if control_replace_maps_from_gs=='yes':
+                checkGS=verifyFileInGeoserver(host,workspace,username,passw,output)
+                if checkGS!='yes':
+                    replace_maps='yes'			
             if replace_maps=='yes':
                 remove_existing_grassfiles(output+'_LULC@'+mapset)
                 remove_existing_grassfiles(output+'_LULC_gen@'+mapset)
