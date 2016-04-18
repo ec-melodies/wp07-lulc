@@ -50,6 +50,7 @@ def set_region(layer,proj_units,t_srx):
         grass.fatal(_("GRASS is not able to define a computational region for LULC process. Please review selected input images."))
 
 def read_landsat_metadata(image_path,image_name):
+    image_name=image_name.strip()
     output_list=[]
     fields = ['DATE_ACQUIRED',
         'SUN_ELEVATION',
@@ -497,6 +498,9 @@ def main():
                 #SET REGION
                 set_region(name_wet.replace('band','band1'),'','')
                 #CLOUD FILL
+                cloudfill_ver_file=os.path.join(log_path,y + "_" + data.output +t)				
+                if replace_images=='Yes' and os.path.isfile(cloudfill_ver_file)==True:
+                    os.remove(cloudfill_ver_file)
                 cloudfill(data.output,y,t,log_path)					
                 #IMPORT USER TRAINING SAMPLES IF EXIST
                 if not parts.scheme or not parts.netloc: 
@@ -588,7 +592,8 @@ def main():
                     ciop.publish(lulcmaptif.replace('.tif','_metadata.xml'), metalink = True)
                     if p_aa==0:
                         ciop.publish(errormatrix, metalink = True)						
-                    upload_to_geoserver(host,workspace,username,passw,lulcmaptif_grey,jobid)				
+                    upload_to_geoserver(host,workspace,username,passw,lulcmaptif_grey,jobid)
+                    os.remove(lulcmaptif_grey)					
                     generatedlulctifs.append(lulcmaptif)
 					
             if del_images=='yes':		
