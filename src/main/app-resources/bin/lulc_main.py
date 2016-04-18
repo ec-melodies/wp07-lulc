@@ -709,7 +709,11 @@ def main():
                 # lulcchangestif=os.path.join(non_grass_outputpath,lulcchangesgen,'.tif')					
                 # lulcchangestif_grey=os.path.join(non_grass_outputpath,lulcchangesgen,'_grey.tif')						
                 #check if file already exists
-                publish_lucc='no'				
+                publish_lucc='no'
+                if control_replace_maps_from_gs=='yes':
+                    checkGS=verifyFileInGeoserver(host,workspace,username,passw,lulcchangesgen)
+                    if checkGS!='yes':
+                        replace_maps='yes'					
                 if replace_maps=='yes':
                     publish_lucc='yes'
                 else:					
