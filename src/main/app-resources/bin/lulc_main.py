@@ -29,7 +29,7 @@ def get_user_training_data(link,output,outputpath):
     return 1
 	
 def verifyFileInGeoserver(host,workspace,username,passw,file):
-    p=subprocess.Popen(["curl","-v","-u","\""+username+":"+passw+"\"",host+"/layers"],stdout=subprocess.PIPE, stderr=subprocess.STDOUT,close_fds=True)
+    p=subprocess.Popen(["curl","-v","-u",username+":"+passw,host+"/layers"],stdout=subprocess.PIPE, stderr=subprocess.STDOUT,close_fds=True)
     while p.stdout.readline()!='':
         f=p.stdout.readline()
         if f.find(file)!=-1:
@@ -488,7 +488,10 @@ def main():
             output=data.output+t+'_'+y
             if control_replace_maps_from_gs=='yes':
                 checkGS=verifyFileInGeoserver(host,workspace,username,passw,output)
-                if checkGS!='yes':
+                if checkGS=='yes':
+                    print output+" already available in geoserver! Skipping production of this map..."
+                    continue
+                else:					
                     replace_maps='yes'			
             if replace_maps=='yes':
                 remove_existing_grassfiles(output+'_LULC@'+mapset)
@@ -712,7 +715,10 @@ def main():
                 publish_lucc='no'
                 if control_replace_maps_from_gs=='yes':
                     checkGS=verifyFileInGeoserver(host,workspace,username,passw,lulcchangesgen)
-                    if checkGS!='yes':
+                    if checkGS=='yes':
+                        print lulcchangesgen+" already available in geoserver! Skipping production of this map..."
+                        continue
+                    else:	
                         replace_maps='yes'					
                 if replace_maps=='yes':
                     publish_lucc='yes'
