@@ -32,6 +32,15 @@ if [ ! -f /data/proxy.txt ]; then
     echo -e "Me Security\nasinara.terradue.com\n3128" > /data/proxy.txt
 fi
 
+#syncronize final data files
+while IFS='' read -r line || [[ -n "$line" ]]; do
+            if [[ $line == *"non_grass_outputpath"* ]]; then
+               export outputpath=${line:21}
+            fi
+done < "/application/variables.txt"
+
+s3cmd sync s3://final-data ${outputpath//\'/} 
+
 #run job for each tile
 while read tile; do
 echo -e "#!/bin/sh\npython /application/bin/lulc_main.py ${tile}" > $executablefile
