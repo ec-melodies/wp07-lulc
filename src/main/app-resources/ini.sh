@@ -38,7 +38,7 @@ while IFS='' read -r line || [[ -n "$line" ]]; do
                export outputpath=${line:21}
             fi
 done < "/application/variables.txt"
-
+mkdir ${outputpath//\'/} -p
 s3cmd sync s3://final-data ${outputpath//\'/} 
 
 #run job for each tile
