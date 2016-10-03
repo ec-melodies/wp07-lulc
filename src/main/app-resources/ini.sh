@@ -29,7 +29,7 @@ if [ ! -f /data/usgs.txt ]; then
     echo -e "criticalsoftware csw123456" > /data/usgs.txt
 fi
 if [ ! -f /data/proxy.txt ]; then
-    echo -e "Me Security\nasinara.terradue.com\n3128" > /data/proxy.txt
+    echo -e "Me Security\n46.163.73.94\n3128" > /data/proxy.txt
 fi
 
 #syncronize final data files
