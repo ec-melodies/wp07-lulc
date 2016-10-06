@@ -14,6 +14,8 @@ anaconda=/opt/anaconda/bin/
  
 # define environment variables
 export executablefile=/data/main.sh
+export usgsfile=/data/usgs.txt
+export proxyfile=/data/proxy.txt
 export Landsat_download=$Landsat_download
 export PATH=$anaconda:$Bin:$Lib:$Extlib:$Landsat_download:$Starspan:$Landsat_LDOPE:$PATH
 export PYTHONPATH=$Lib:$anaconda
@@ -26,10 +28,10 @@ if [ ! -f $imagesfld/log.txt ]; then
     echo -e " " > $imagesfld/log.txt
 fi
 if [ ! -f /data/usgs.txt ]; then
-    echo -e "criticalsoftware csw123456" > /data/usgs.txt
+    echo -e "criticalsoftware csw123456" > $usgsfile
 fi
 if [ ! -f /data/proxy.txt ]; then
-    echo -e "Me Security\n46.163.73.94\n3128" > /data/proxy.txt
+    echo -e "Me Security\n46.163.73.94\n3128" > $proxyfile
 fi
 
 #syncronize final data files
@@ -59,6 +61,8 @@ else
 fi
 
 rm $executablefile
+rm $usgsfile
+rm $proxyfile
 
 done
 
