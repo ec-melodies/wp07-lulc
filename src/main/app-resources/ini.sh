@@ -39,7 +39,7 @@ while IFS='' read -r line || [[ -n "$line" ]]; do
             fi
 done < "/application/variables.txt"
 mkdir ${outputpath//\'/} -p
-s3cmd sync s3://final-data ${outputpath//\'/} 
+s3cmd -f sync s3://final-data ${outputpath//\'/} 
 
 #run job for each tile
 while read tile; do
@@ -54,7 +54,7 @@ if [ -d "$Grassdir/World/National/" ]; then
 else
     echo "---Fetching GRASS_data from S3---"
     mkdir $Grassdir
-    s3cmd get s3://grass-data --recursive $Grassdir
+    s3cmd -f get s3://grass-data --recursive $Grassdir
     grass64 -text $Grassdir/World/National/	
 fi
 
