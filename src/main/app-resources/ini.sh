@@ -27,12 +27,9 @@ mkdir $imagesfld -p
 if [ ! -f $imagesfld/log.txt ]; then
     echo -e " " > $imagesfld/log.txt
 fi
-if [ ! -f /data/usgs.txt ]; then
-    echo -e "criticalsoftware csw123456" > $usgsfile
-fi
-if [ ! -f /data/proxy.txt ]; then
-    echo -e "Me Security\n46.163.73.94\n3128" > $proxyfile
-fi
+echo -e "criticalsoftware csw123456" > $usgsfile
+echo -e "Me Security\n46.163.73.94\n3128" > $proxyfile
+
 
 #syncronize final data files
 while IFS='' read -r line || [[ -n "$line" ]]; do
