@@ -37,6 +37,6 @@ store='test'
 proxy_user='Me'
 proxy_passwd='Security'
 proxy_host='87.98.219.96'
-proxy_port='8080'
+proxy_port=8080
 usgs_user='criticalsoftware'
 usgs_passwd='csw123456'
