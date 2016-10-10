@@ -58,8 +58,8 @@ mkdir $imagesfld -p
 if [ ! -f $imagesfld/log.txt ]; then
     echo -e " " > $imagesfld/log.txt
 fi
-echo -e "$usgs_user $usgs_passwd" > $usgsfile
-echo -e "$proxy_user $proxy_passwd\n$proxy_host\n$proxy_port" > $proxyfile
+echo -e "${usgs_user//"'"/} ${usgs_passwd//"'"/}" > $usgsfile
+echo -e "${proxy_user//"'"/} ${proxy_passwd//"'"/}\n${proxy_host//"'"/}\n${proxy_port//"'"/}" > $proxyfile
 
 #run job for each tile
 while read tile; do
