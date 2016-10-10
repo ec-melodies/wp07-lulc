@@ -15,6 +15,7 @@ anaconda=/opt/anaconda/bin/
 # define environment variables
 export executablefile=/data/main.sh
 export usgsfile=/data/usgs.txt
+export variablesfile=/application/variables.txt
 export proxyfile=/data/proxy.txt
 export Landsat_download=$Landsat_download
 export PATH=$anaconda:$Bin:$Lib:$Extlib:$Landsat_download:$Starspan:$Landsat_LDOPE:$PATH
@@ -22,24 +23,43 @@ export PYTHONPATH=$Lib:$anaconda
 export LD_LIBRARY_PATH=/usr/local/lib/otb
 export GDAL_DATA=/application/gdal
 
+# read some variables from variables.txt
+while IFS='' read -r line || [[ -n "$line" ]]; do
+            if [[ $line == *"non_grass_outputpath"* ]]; then
+               export outputpath=${line:21}
+            fi
+			if [[ $line == *"proxy_user"* ]]; then
+               export proxy_user=${line:11}
+            fi
+			if [[ $line == *"proxy_passwd"* ]]; then
+               export proxy_passwd=${line:13}
+            fi
+			if [[ $line == *"proxy_host"* ]]; then
+               export proxy_host=${line:11}
+            fi
+			if [[ $line == *"proxy_port"* ]]; then
+               export proxy_port=${line:11}
+            fi	
+			if [[ $line == *"usgs_user"* ]]; then
+               export usgs_user=${line:10}
+            fi
+			if [[ $line == *"usgs_passwd"* ]]; then
+               export usgs_passwd=${line:12}
+            fi				
+done < $variablesfile
+
+#syncronize final data files
+echo "---Syncronizing files with S3 storage---"
+mkdir ${outputpath//\'/} -p
+s3cmd -f sync s3://final-data ${outputpath//\'/} --skip-existing
+
 #create images folder and needed files
 mkdir $imagesfld -p
 if [ ! -f $imagesfld/log.txt ]; then
     echo -e " " > $imagesfld/log.txt
 fi
-echo -e "criticalsoftware csw123456" > $usgsfile
-echo -e "Me Security\n46.163.73.94\n3128" > $proxyfile
-
-
-#syncronize final data files
-while IFS='' read -r line || [[ -n "$line" ]]; do
-            if [[ $line == *"non_grass_outputpath"* ]]; then
-               export outputpath=${line:21}
-            fi
-done < "/application/variables.txt"
-echo "---Syncronizing files with S3 storage---"
-mkdir ${outputpath//\'/} -p
-s3cmd -f sync s3://final-data ${outputpath//\'/} --skip-existing
+echo -e "$usgs_user $usgs_passwd" > $usgsfile
+echo -e "$proxy_user $proxy_passwd\n$proxy_host\n$proxy_port" > $proxyfile
 
 #run job for each tile
 while read tile; do
