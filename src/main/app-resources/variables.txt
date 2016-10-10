@@ -32,9 +32,8 @@ workspace='melodies-wp7'
 username='melodies-wp7'
 republish_to_geoserver='yes'
 proxy_path='/data/proxy.txt'
-####do not use ' in the following variables
-passw=changeme
-store=test
+passw='changeme'
+store='test'
 proxy_user='Me'
 proxy_passwd='Security'
 proxy_host='87.98.219.96'
