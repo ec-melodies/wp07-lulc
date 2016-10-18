@@ -86,7 +86,7 @@
 							</resources>
 						</configuration>
 					</execution>
-					<!-- <execution>
+					<execution>
 						<id>copy-data-resources</id>
 						<phase>install</phase>
 						<goals>
@@ -103,7 +103,7 @@
 								</resource>
 							</resources>
 						</configuration>
-					</execution>-->
+					</execution>
 				</executions>
 			</plugin>
 
