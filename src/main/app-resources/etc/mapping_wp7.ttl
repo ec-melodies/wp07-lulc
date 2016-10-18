@@ -1,0 +1,906 @@
+@prefix rr: <http://www.w3.org/ns/r2rml#>.
+@prefix  rml: <http://semweb.mmlab.be/ns/rml#> .
+@prefix ql: <http://semweb.mmlab.be/ns/ql#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#>.
+@base <http://example.com/base> .
+@prefix rrx: <http://www.w3.org/ns/r2rml-ext#>.
+@prefix rrxf: <http://www.w3.org/ns/r2rml-ext/functions/def/>.
+@prefix ogc: <http://www.opengis.net/ont/geosparql#>.
+@prefix schema: <http://schema.org/>.
+@prefix wgs84_pos: <http://www.w3.org/2003/01/geo/wgs84_pos#>.
+@prefix onto: <http://melodiesproject.eu/WP7/ontology#>.
+
+@prefix wTrbn: <http://www.w3.org/2001/XMLSchema#> .
+@prefix sJBPo: <http://www.opengis.net/gml#> .
+@prefix rYgqW: <http://ogr.maptools.org/#> .
+@prefix Ukpit: <http://www.w3.org/XML/1998/namespace#> .
+@prefix UYplF: <http://www.w3.org/1999/xlink#> .
+<#Metadata>
+rml:logicalSource [
+	rml:source "outputxmlfile";
+	rml:referenceFormulation ql:XPath;
+	rml:iterator "/gmd:MD_Metadata";
+];
+rr:subjectMap [
+	rr:template "http://melodiesproject.eu/WP7/FileMetadata/id/{dataset_name}/{GeoTriplesID}";
+	rr:class onto:FileMetadata;
+];
+
+
+
+rr:predicateObjectMap [
+	rr:predicateMap [ rr:constant onto:hasLanguageCode ];
+	rr:objectMap [
+		rml:reference "gmd:language/gmd:LanguageCode";
+	];
+];
+
+rr:predicateObjectMap [
+	rr:predicateMap [ rr:constant onto:hasMD_ScopeCode ];
+	rr:objectMap [
+		rml:reference "gmd:hierarchyLevel/gmd:MD_ScopeCode";
+	];
+];
+
+
+rr:predicateObjectMap [
+	rr:predicateMap [ rr:constant onto:hasContact ];
+	rr:objectMap [
+		rr:template "http://melodiesproject.eu/WP7/Contact/id/{dataset_name}/{gmd:contact/GeoTriplesID}";
+	];
+];
+
+rr:predicateObjectMap [
+	rr:predicateMap [ rr:constant onto:hasReferenceSystemInfo ];
+	rr:objectMap [
+		rr:template "http://melodiesproject.eu/WP7/ReferenceSystemInfo/id/{dataset_name}/{gmd:referenceSystemInfo/GeoTriplesID}";
+	];
+];
+
+rr:predicateObjectMap [
+	rr:predicateMap [ rr:constant onto:hasIdentificationInfo ];
+	rr:objectMap [
+		rr:template "http://melodiesproject.eu/WP7/IdentificationInfo/id/{dataset_name}/{gmd:identificationInfo/GeoTriplesID}";
+	];
+];
+
+
+rr:predicateObjectMap [
+	rr:predicateMap [ rr:constant onto:hasDataQualityInfo ];
+	rr:objectMap [
+		rr:template "http://melodiesproject.eu/WP7/DataQualityInfo/id/{dataset_name}/{gmd:dataQualityInfo/GeoTriplesID}";
+	];
+];
+.
+
+
+
+
+
+
+
+
+
+<#Contact>
+rml:logicalSource [
+	rml:source "outputxmlfile";
+	rml:referenceFormulation ql:XPath;
+	rml:iterator "/gmd:MD_Metadata/gmd:contact";
+];
+rr:subjectMap [
+	rr:template "http://melodiesproject.eu/WP7/Contact/id/{dataset_name}/{GeoTriplesID}";
+	rr:class onto:Contact;
+];
+
+rr:predicateObjectMap [
+	rr:predicateMap [ rr:constant onto:hasCI_ResponsibleParty ];
+	rr:objectMap [
+		rr:template "http://melodiesproject.eu/WP7/CI_ResponsibleParty/id/{dataset_name}/{gmd:CI_ResponsibleParty/GeoTriplesID}";
+	];
+].
+
+
+<#CI_ResponsibleParty>
+rml:logicalSource [
+	rml:source "outputxmlfile";
+	rml:referenceFormulation ql:XPath;
+	rml:iterator "/gmd:MD_Metadata/gmd:contact/gmd:CI_ResponsibleParty";
+];
+rr:subjectMap [
+	rr:template "http://melodiesproject.eu/WP7/CI_ResponsibleParty/id/{dataset_name}/{GeoTriplesID}";
+	rr:class onto:CI_ResponsibleParty;
+];
+
+rr:predicateObjectMap [
+	rr:predicateMap [ rr:constant onto:hasIndividualName ];
+	rr:objectMap [
+		rml:reference "gmd:individualName/gco:CharacterString";
+	];
+];
+
+rr:predicateObjectMap [
+	rr:predicateMap [ rr:constant onto:hasIndividualName ];
+	rr:objectMap [
+		rml:reference "gmd:organisationName/gco:CharacterString";
+	];
+];
+
+rr:predicateObjectMap [
+	rr:predicateMap [ rr:constant onto:hasIndividualName ];
+	rr:objectMap [
+		rml:reference "gmd:role/gco:CharacterString";
+	];
+];
+
+rr:predicateObjectMap [
+	rr:predicateMap [ rr:constant onto:hasContactInfo ];
+	rr:objectMap [
+		rr:template "http://melodiesproject.eu/WP7/ContactInfo/id/{dataset_name}/{gmd:contactInfo/GeoTriplesID}";
+	];
+].
+
+
+
+<#ContactInfo>
+rml:logicalSource [
+	rml:source "outputxmlfile";
+	rml:referenceFormulation ql:XPath;
+	rml:iterator "/gmd:MD_Metadata/gmd:contact/gmd:CI_ResponsibleParty/gmd:contactInfo";
+];
+rr:subjectMap [
+	rr:template "http://melodiesproject.eu/WP7/ContactInfo/id/{dataset_name}/{GeoTriplesID}";
+	rr:class onto:ContactInfo;
+];
+
+rr:predicateObjectMap [
+	rr:predicateMap [ rr:constant onto:hasCI_Contact ];
+	rr:objectMap [
+		rr:template "http://melodiesproject.eu/WP7/CI_Contact/id/{dataset_name}/{gmd:CI_Contact/GeoTriplesID}";
+	];
+].
+
+
+<#CI_Contact>
+rml:logicalSource [
+	rml:source "outputxmlfile";
+	rml:referenceFormulation ql:XPath;
+	rml:iterator "/gmd:MD_Metadata/gmd:contact/gmd:CI_ResponsibleParty/gmd:contactInfo/gmd:CI_Contact";
+];
+rr:subjectMap [
+	rr:template "http://melodiesproject.eu/WP7/CI_Contact/id/{dataset_name}/{GeoTriplesID}";
+	rr:class onto:CI_Contact;
+];
+
+rr:predicateObjectMap [
+	rr:predicateMap [ rr:constant onto:hasPhone ];
+	rr:objectMap [
+		rr:template "http://melodiesproject.eu/WP7/Phone/id/{dataset_name}/{gmd:phone/GeoTriplesID}";
+	];
+];
+
+rr:predicateObjectMap [
+	rr:predicateMap [ rr:constant onto:hasAddress ];
+	rr:objectMap [
+		rr:template "http://melodiesproject.eu/WP7/Address/id/{dataset_name}/{gmd:address/GeoTriplesID}";
+	];
+].
+
+
+<#Phone>
+rml:logicalSource [
+	rml:source "outputxmlfile";
+	rml:referenceFormulation ql:XPath;
+	rml:iterator "/gmd:MD_Metadata/gmd:contact/gmd:CI_ResponsibleParty/gmd:contactInfo/gmd:CI_Contact/gmd:phone";
+];
+rr:subjectMap [
+	rr:template "http://melodiesproject.eu/WP7/Phone/id/{dataset_name}/{GeoTriplesID}";
+	rr:class onto:Phone;
+];
+
+rr:predicateObjectMap [
+	rr:predicateMap [ rr:constant onto:hasCI_Telephone ];
+	rr:objectMap [
+		rr:template "http://melodiesproject.eu/WP7/CI_Telephone/id/{dataset_name}/{gmd:CI_Telephone/GeoTriplesID}";
+	];
+].
+
+
+<#CI_Telephone>
+rml:logicalSource [
+	rml:source "outputxmlfile";
+	rml:referenceFormulation ql:XPath;
+	rml:iterator "/gmd:MD_Metadata/gmd:contact/gmd:CI_ResponsibleParty/gmd:contactInfo/gmd:CI_Contact/gmd:phone/gmd:CI_Telephone";
+];
+rr:subjectMap [
+	rr:template "http://melodiesproject.eu/WP7/CI_Telephone/id/{dataset_name}/{GeoTriplesID}";
+	rr:class onto:CI_Telephone;
+];
+
+rr:predicateObjectMap [
+	rr:predicateMap [ rr:constant onto:hasVoiceNumber ];
+	rr:objectMap [
+		rml:reference "gmd:voice/gco:CharacterString";
+	];
+];
+
+rr:predicateObjectMap [
+	rr:predicateMap [ rr:constant onto:hasFacsimileNumber ];
+	rr:objectMap [
+		rml:reference "gmd:facsimile/gco:CharacterString";
+	];
+].
+
+
+<#Address>
+rml:logicalSource [
+	rml:source "outputxmlfile";
+	rml:referenceFormulation ql:XPath;
+	rml:iterator "/gmd:MD_Metadata/gmd:contact/gmd:CI_ResponsibleParty/gmd:contactInfo/gmd:CI_Contact/gmd:address";
+];
+rr:subjectMap [
+	rr:template "http://melodiesproject.eu/WP7/Address/id/{dataset_name}/{GeoTriplesID}";
+	rr:class onto:Address;
+];
+
+rr:predicateObjectMap [
+	rr:predicateMap [ rr:constant onto:hasCI_Address ];
+	rr:objectMap [
+		rr:template "http://melodiesproject.eu/WP7/CI_Address/id/{dataset_name}/{gmd:CI_Address/GeoTriplesID}";
+	];
+].
+
+
+<#CI_Address>
+rml:logicalSource [
+	rml:source "outputxmlfile";
+	rml:referenceFormulation ql:XPath;
+	rml:iterator "/gmd:MD_Metadata/gmd:contact/gmd:CI_ResponsibleParty/gmd:contactInfo/gmd:CI_Contact/gmd:address/gmd:CI_Address";
+];
+rr:subjectMap [
+	rr:template "http://melodiesproject.eu/WP7/CI_Address/id/{dataset_name}/{GeoTriplesID}";
+	rr:class onto:CI_Address;
+];
+
+rr:predicateObjectMap [
+	rr:predicateMap [ rr:constant onto:hasDeliveryPoint ];
+	rr:objectMap [
+		rml:reference "gmd:deliveryPoint/gco:CharacterString";
+	];
+];
+
+rr:predicateObjectMap [
+	rr:predicateMap [ rr:constant onto:hasCity ];
+	rr:objectMap [
+		rml:reference "gmd:city/gco:CharacterString";
+	];
+];
+
+rr:predicateObjectMap [
+	rr:predicateMap [ rr:constant onto:hasPostalCode ];
+	rr:objectMap [
+		rml:reference "gmd:postalCode/gco:CharacterString";
+	];
+];
+
+rr:predicateObjectMap [
+	rr:predicateMap [ rr:constant onto:hasCountry ];
+	rr:objectMap [
+		rml:reference "gmd:country/gco:CharacterString";
+	];
+];
+
+rr:predicateObjectMap [
+	rr:predicateMap [ rr:constant onto:hasElectronicMailAddress ];
+	rr:objectMap [
+		rml:reference "gmd:electronicMailAddress/gco:CharacterString";
+	];
+].
+
+
+
+
+<#ReferenceSystemInfo>
+rml:logicalSource [
+	rml:source "outputxmlfile";
+	rml:referenceFormulation ql:XPath;
+	rml:iterator "/gmd:MD_Metadata/gmd:referenceSystemInfo";
+];
+rr:subjectMap [
+	rr:template "http://melodiesproject.eu/WP7/ReferenceSystemInfo/id/{dataset_name}/{GeoTriplesID}";
+	rr:class onto:ReferenceSystemInfo;
+];
+
+rr:predicateObjectMap [
+	rr:predicateMap [ rr:constant onto:hasMD_ReferenceSystem ];
+	rr:objectMap [
+		rr:template "http://melodiesproject.eu/WP7/MD_ReferenceSystem/id/{dataset_name}/{gmd:MD_ReferenceSystem/GeoTriplesID}";
+	];
+].
+
+
+<#MD_ReferenceSystem>
+rml:logicalSource [
+	rml:source "outputxmlfile";
+	rml:referenceFormulation ql:XPath;
+	rml:iterator "/gmd:MD_Metadata/gmd:referenceSystemInfo/gmd:MD_ReferenceSystem";
+];
+rr:subjectMap [
+	rr:template "http://melodiesproject.eu/WP7/MD_ReferenceSystem/id/{dataset_name}/{GeoTriplesID}";
+	rr:class onto:MD_ReferenceSystem;
+];
+
+rr:predicateObjectMap [
+	rr:predicateMap [ rr:constant onto:hasReferenceSystemIdentifier ];
+	rr:objectMap [
+		rr:template "http://melodiesproject.eu/WP7/ReferenceSystemIdentifier/id/{dataset_name}/{gmd:referenceSystemIdentifier/GeoTriplesID}";
+	];
+].
+
+
+<#ReferenceSystemIdentifier>
+rml:logicalSource [
+	rml:source "outputxmlfile";
+	rml:referenceFormulation ql:XPath;
+	rml:iterator "/gmd:MD_Metadata/gmd:referenceSystemInfo/gmd:MD_ReferenceSystem/gmd:referenceSystemIdentifier";
+];
+rr:subjectMap [
+	rr:template "http://melodiesproject.eu/WP7/ReferenceSystemIdentifier/id/{dataset_name}/{GeoTriplesID}";
+	rr:class onto:ReferenceSystemIdentifier;
+];
+
+rr:predicateObjectMap [
+	rr:predicateMap [ rr:constant onto:hasRS_Identifier ];
+	rr:objectMap [
+		rr:template "http://melodiesproject.eu/WP7/RS_Identifier/id/{dataset_name}/{gmd:RS_Identifier/GeoTriplesID}";
+	];
+].
+
+
+<#RS_Identifier>
+rml:logicalSource [
+	rml:source "outputxmlfile";
+	rml:referenceFormulation ql:XPath;
+	rml:iterator "/gmd:MD_Metadata/gmd:referenceSystemInfo/gmd:MD_ReferenceSystem/gmd:referenceSystemIdentifier/gmd:RS_Identifier";
+];
+rr:subjectMap [
+	rr:template "http://melodiesproject.eu/WP7/RS_Identifier/id/{dataset_name}/{GeoTriplesID}";
+	rr:class onto:RS_Identifier;
+];
+
+rr:predicateObjectMap [
+	rr:predicateMap [ rr:constant onto:hasCode ];
+	rr:objectMap [
+		rml:reference "gmd:code/gco:CharacterString";
+	];
+].
+
+
+<#IdentificationInfo>
+rml:logicalSource [
+	rml:source "outputxmlfile";
+	rml:referenceFormulation ql:XPath;
+	rml:iterator "/gmd:MD_Metadata/gmd:identificationInfo";
+];
+rr:subjectMap [
+	rr:template "http://melodiesproject.eu/WP7/IdentificationInfo/id/{dataset_name}/{GeoTriplesID}";
+	rr:class onto:IdentificationInfo;
+];
+
+rr:predicateObjectMap [
+	rr:predicateMap [ rr:constant onto:hasMD_DataIdentification ];
+	rr:objectMap [
+		rr:template "http://melodiesproject.eu/WP7/MD_DataIdentification/id/{dataset_name}/{gmd:MD_DataIdentification/GeoTriplesID}";
+	];
+].
+
+
+<#MD_DataIdentification>
+rml:logicalSource [
+	rml:source "outputxmlfile";
+	rml:referenceFormulation ql:XPath;
+	rml:iterator "/gmd:MD_Metadata/gmd:identificationInfo/gmd:MD_DataIdentification";
+];
+rr:subjectMap [
+	rr:template "http://melodiesproject.eu/WP7/MD_DataIdentification/id/{dataset_name}/{GeoTriplesID}";
+	rr:class onto:MD_DataIdentification;
+];
+
+rr:predicateObjectMap [
+	rr:predicateMap [ rr:constant onto:hasCitation ];
+	rr:objectMap [
+		rr:template "http://melodiesproject.eu/WP7/Citation/id/{dataset_name}/{gmd:citation/GeoTriplesID}";
+	];
+];
+
+rr:predicateObjectMap [
+	rr:predicateMap [ rr:constant onto:hasAbstract ];
+	rr:objectMap [
+		rml:reference "gmd:abstract/gco:CharacterString";
+	];
+];
+
+
+rr:predicateObjectMap [
+	rr:predicateMap [ rr:constant onto:hasPurpose ];
+	rr:objectMap [
+		rml:reference "gmd:purpose/gco:CharacterString";
+	];
+];
+
+rr:predicateObjectMap [
+	rr:predicateMap [ rr:constant onto:hasCredit ];
+	rr:objectMap [
+		rml:reference "gmd:credit/gco:CharacterString";
+	];
+];
+
+rr:predicateObjectMap [
+	rr:predicateMap [ rr:constant onto:hasSpatialRepresentationType ];
+	rr:objectMap [
+		rml:reference "gmd:spatialRepresentationType/gmd:MD_SpatialRepresentationTypeCode";
+	];
+];
+
+rr:predicateObjectMap [
+	rr:predicateMap [ rr:constant onto:hasSpatialResolution ];
+	rr:objectMap [
+		rr:template "http://melodiesproject.eu/WP7/SpatialResolution/id/{dataset_name}/{gmd:spatialResolution/GeoTriplesID}";
+	];
+];
+
+rr:predicateObjectMap [
+	rr:predicateMap [ rr:constant onto:hasMinimumMappingUnit ];
+	rr:objectMap [
+		rr:template "http://melodiesproject.eu/WP7/MinimumMappingUnit/id/{dataset_name}/{gmd:MinimumMappingUnit/GeoTriplesID}";
+	];
+];
+
+rr:predicateObjectMap [
+	rr:predicateMap [ rr:constant onto:hasExtent ];
+	rr:objectMap [
+		rr:template "http://melodiesproject.eu/WP7/Extent/id/{dataset_name}/{gmd:extent/GeoTriplesID}";
+	];
+].
+
+
+
+<#Citation>
+rml:logicalSource [
+	rml:source "outputxmlfile";
+	rml:referenceFormulation ql:XPath;
+	rml:iterator "/gmd:MD_Metadata/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:citation";
+];
+rr:subjectMap [
+	rr:template "http://melodiesproject.eu/WP7/Citation/id/{dataset_name}/{GeoTriplesID}";
+	rr:class onto:Citation;
+];
+
+rr:predicateObjectMap [
+	rr:predicateMap [ rr:constant onto:hasCI_Citation ];
+	rr:objectMap [
+		rr:template "http://melodiesproject.eu/WP7/MinimumMappingUnit/id/{dataset_name}/{gmd:CI_Citation/GeoTriplesID}";
+	];
+].
+
+<#CI_Citation>
+rml:logicalSource [
+	rml:source "outputxmlfile";
+	rml:referenceFormulation ql:XPath;
+	rml:iterator "/gmd:MD_Metadata/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:citation/gmd:CI_Citation";
+];
+rr:subjectMap [
+	rr:template "http://melodiesproject.eu/WP7/CI_Citation/id/{dataset_name}/{GeoTriplesID}";
+	rr:class onto:CI_Citation;
+];
+
+rr:predicateObjectMap [
+	rr:predicateMap [ rr:constant onto:hasTitle ];
+	rr:objectMap [
+		rml:reference "gmd:title/gco:CharacterString";
+	];
+];
+
+rr:predicateObjectMap [
+	rr:predicateMap [ rr:constant onto:hasAlternateTitle ];
+	rr:objectMap [
+		rml:reference "gmd:alternateTitle/gco:CharacterString";
+	];
+];
+
+rr:predicateObjectMap [
+	rr:predicateMap [ rr:constant onto:hasCI_Date ];
+	rr:objectMap [
+		rr:template "http://melodiesproject.eu/WP7/CI_Date/id/{dataset_name}/{gmd:CI_Date/GeoTriplesID}";
+	];
+].
+
+<#CI_Date>
+rml:logicalSource [
+	rml:source "outputxmlfile";
+	rml:referenceFormulation ql:XPath;
+	rml:iterator "/gmd:MD_Metadata/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:citation/gmd:CI_Citation/gmd:CI_Date";
+];
+rr:subjectMap [
+	rr:template "http://melodiesproject.eu/WP7/CI_Date/id/{dataset_name}/{GeoTriplesID}";
+	rr:class onto:CI_Date;
+];
+
+rr:predicateObjectMap [
+	rr:predicateMap [ rr:constant onto:hasDate ];
+	rr:objectMap [
+		rml:reference "gmd:date/gco:Date";
+	];
+];
+
+rr:predicateObjectMap [
+	rr:predicateMap [ rr:constant onto:hasDateType ];
+	rr:objectMap [
+		rml:reference "gmd:dateType/gco:CI_DateTypeCode";
+	];
+].
+
+
+<#SpatialResolution>
+rml:logicalSource [
+	rml:source "outputxmlfile";
+	rml:referenceFormulation ql:XPath;
+	rml:iterator "/gmd:MD_Metadata/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:spatialResolution";
+];
+rr:subjectMap [
+	rr:template "http://melodiesproject.eu/WP7/SpatialResolution/id/{dataset_name}/{GeoTriplesID}";
+	rr:class onto:SpatialResolution;
+];
+
+rr:predicateObjectMap [
+	rr:predicateMap [ rr:constant onto:hasMD_Resolution ];
+	rr:objectMap [
+		rr:template "http://melodiesproject.eu/WP7/MD_Resolution/id/{dataset_name}/{gmd:MD_Resolution/GeoTriplesID}";
+	];
+].
+
+<#MD_Resolution>
+rml:logicalSource [
+	rml:source "outputxmlfile";
+	rml:referenceFormulation ql:XPath;
+	rml:iterator "/gmd:MD_Metadata/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:spatialResolution/gmd:MD_Resolution";
+];
+rr:subjectMap [
+	rr:template "http://melodiesproject.eu/WP7/MD_Resolution/id/{dataset_name}/{GeoTriplesID}";
+	rr:class onto:MD_Resolution;
+];
+
+rr:predicateObjectMap [
+	rr:predicateMap [ rr:constant onto:hasDistance ];
+	rr:objectMap [
+		rml:reference "gmd:distance/gco:Distance";
+	];
+];
+
+rr:predicateObjectMap [
+	rr:predicateMap [ rr:constant onto:hasDistanceUOM ];
+	rr:objectMap [
+		rml:reference "gmd:distance/gco:Distance/@uom";
+	];
+].
+
+<#MinimumMappingUnit>
+rml:logicalSource [
+	rml:source "outputxmlfile";
+	rml:referenceFormulation ql:XPath;
+	rml:iterator "/gmd:MD_Metadata/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:MinimumMappingUnit";
+];
+rr:subjectMap [
+	rr:template "http://melodiesproject.eu/WP7/MinimumMappingUnit/id/{dataset_name}/{GeoTriplesID}";
+	rr:class onto:MinimumMappingUnit;
+];
+
+rr:predicateObjectMap [
+	rr:predicateMap [ rr:constant onto:hasArea ];
+	rr:objectMap [
+		rr:template "http://melodiesproject.eu/WP7/Area/id/{dataset_name}/{gmd:area/GeoTriplesID}";
+	];
+].
+
+<#Area>
+rml:logicalSource [
+	rml:source "outputxmlfile";
+	rml:referenceFormulation ql:XPath;
+	rml:iterator "/gmd:MD_Metadata/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:MinimumMappingUnit/gmd:area";
+];
+rr:subjectMap [
+	rr:template "http://melodiesproject.eu/WP7/Area/id/{dataset_name}/{GeoTriplesID}";
+	rr:class onto:Area;
+];
+
+rr:predicateObjectMap [
+	rr:predicateMap [ rr:constant onto:hasMinimumMappingUnit ];
+	rr:objectMap [
+		rml:reference "gco:MinimumMappingUnit";
+	];
+];
+
+rr:predicateObjectMap [
+	rr:predicateMap [ rr:constant onto:hasMinimumMappingUnitUOM ];
+	rr:objectMap [
+		rml:reference "gco:MinimumMappingUnit/@uom";
+	];
+].
+
+
+
+<#Extent>
+rml:logicalSource [
+	rml:source "outputxmlfile";
+	rml:referenceFormulation ql:XPath;
+	rml:iterator "/gmd:MD_Metadata/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:extent";
+];
+rr:subjectMap [
+	rr:template "http://melodiesproject.eu/WP7/Extent/id/{dataset_name}/{GeoTriplesID}";
+	rr:class onto:Extent;
+];
+
+rr:predicateObjectMap [
+	rr:predicateMap [ rr:constant onto:hasEX_Extent ];
+	rr:objectMap [
+		rr:template "http://melodiesproject.eu/WP7/EX_Extent/id/{dataset_name}/{gmd:EX_Extent/GeoTriplesID}";
+	];
+].
+
+<#EX_Extent>
+rml:logicalSource [
+	rml:source "outputxmlfile";
+	rml:referenceFormulation ql:XPath;
+	rml:iterator "/gmd:MD_Metadata/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:extent/gmd:EX_Extent";
+];
+rr:subjectMap [
+	rr:template "http://melodiesproject.eu/WP7/EX_Extent/id/{dataset_name}/{GeoTriplesID}";
+	rr:class onto:EX_Extent;
+];
+
+rr:predicateObjectMap [
+	rr:predicateMap [ rr:constant onto:hasEX_Extent ];
+	rr:objectMap [
+		rr:template "http://melodiesproject.eu/WP7/GeographicElement/id/{dataset_name}/{gmd:geographicElement/GeoTriplesID}";
+	];
+].
+
+<#GeographicElement>
+rml:logicalSource [
+	rml:source "outputxmlfile";
+	rml:referenceFormulation ql:XPath;
+	rml:iterator "/gmd:MD_Metadata/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:extent/gmd:EX_Extent/gmd:geographicElement";
+];
+rr:subjectMap [
+	rr:template "http://melodiesproject.eu/WP7/GeographicElement/id/{dataset_name}/{GeoTriplesID}";
+	rr:class onto:GeographicElement;
+];
+
+rr:predicateObjectMap [
+	rr:predicateMap [ rr:constant onto:hasEX_GeographicBoundingBox ];
+	rr:objectMap [
+		rr:template "http://melodiesproject.eu/WP7/EX_GeographicBoundingBox/id/{dataset_name}/{gmd:EX_GeographicBoundingBox/GeoTriplesID}";
+	];
+].
+
+<#EX_GeographicBoundingBox>
+rml:logicalSource [
+	rml:source "outputxmlfile";
+	rml:referenceFormulation ql:XPath;
+	rml:iterator "/gmd:MD_Metadata/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:extent/gmd:EX_Extent/gmd:geographicElement/gmd:EX_GeographicBoundingBox";
+];
+rr:subjectMap [
+	rr:template "http://melodiesproject.eu/WP7/EX_GeographicBoundingBox/id/{dataset_name}/{GeoTriplesID}";
+	rr:class onto:EX_GeographicBoundingBox;
+];
+
+rr:predicateObjectMap [
+	rr:predicateMap [ rr:constant onto:hasExtentTypeCode ];
+	rr:objectMap [
+		rml:reference "gmd:extentTypeCode/gco:Boolean";
+	];
+];
+
+rr:predicateObjectMap [
+	rr:predicateMap [ rr:constant onto:hasWestBoundLongitude ];
+	rr:objectMap [
+		rml:reference "gmd:westBoundLongitude/gco:Decimal";
+	];
+];
+
+rr:predicateObjectMap [
+	rr:predicateMap [ rr:constant onto:hasEastBoundLongitude ];
+	rr:objectMap [
+		rml:reference "gmd:eastBoundLongitude/gco:Decimal";
+	];
+];
+
+rr:predicateObjectMap [
+	rr:predicateMap [ rr:constant onto:hasSouthBoundLatitude ];
+	rr:objectMap [
+		rml:reference "gmd:southBoundLatitude/gco:Decimal";
+	];
+];
+
+rr:predicateObjectMap [
+	rr:predicateMap [ rr:constant onto:hasNorthBoundLongitude ];
+	rr:objectMap [
+		rml:reference "gmd:northBoundLongitude/gco:Decimal";
+	];
+];
+
+.
+
+
+
+
+<#DataQualityInfo>
+rml:logicalSource [
+	rml:source "outputxmlfile";
+	rml:referenceFormulation ql:XPath;
+	rml:iterator "/gmd:MD_Metadata/gmd:dataQualityInfo";
+];
+rr:subjectMap [
+	rr:template "http://melodiesproject.eu/WP7/DataQualityInfo/id/{dataset_name}/{GeoTriplesID}";
+	rr:class onto:DataQualityInfo;
+];
+
+rr:predicateObjectMap [
+	rr:predicateMap [ rr:constant onto:hasDQ_DataQuality ];
+	rr:objectMap [
+		rr:template "http://melodiesproject.eu/WP7/DQ_DataQuality/id/{dataset_name}/{gmd:DQ_DataQuality/GeoTriplesID}";
+	];
+];
+.
+
+
+<#DQ_DataQuality>
+rml:logicalSource [
+	rml:source "outputxmlfile";
+	rml:referenceFormulation ql:XPath;
+	rml:iterator "/gmd:MD_Metadata/gmd:dataQualityInfo/gmd:DQ_DataQuality";
+];
+rr:subjectMap [
+	rr:template "http://melodiesproject.eu/WP7/DQ_DataQuality/id/{dataset_name}/{GeoTriplesID}";
+	rr:class onto:DQ_DataQuality;
+];
+
+rr:predicateObjectMap [
+	rr:predicateMap [ rr:constant onto:hasScope ];
+	rr:objectMap [
+		rr:template "http://melodiesproject.eu/WP7/Scope/id/{dataset_name}/{gmd:scope/GeoTriplesID}";
+	];
+];
+
+rr:predicateObjectMap [
+	rr:predicateMap [ rr:constant onto:hasLineage ];
+	rr:objectMap [
+		rr:template "http://melodiesproject.eu/WP7/Lineage/id/{dataset_name}/{gmd:lineage/GeoTriplesID}";
+	];
+];
+.
+
+
+
+<#Scope>
+rml:logicalSource [
+	rml:source "outputxmlfile";
+	rml:referenceFormulation ql:XPath;
+	rml:iterator "/gmd:MD_Metadata/gmd:dataQualityInfo/gmd:DQ_DataQuality/gmd:scope";
+];
+rr:subjectMap [
+	rr:template "http://melodiesproject.eu/WP7/Scope/id/{dataset_name}/{GeoTriplesID}";
+	rr:class onto:Scope;
+];
+
+rr:predicateObjectMap [
+	rr:predicateMap [ rr:constant onto:hasDQ_Scope ];
+	rr:objectMap [
+		rr:template "http://melodiesproject.eu/WP7/DQ_Scope/id/{dataset_name}/{gmd:DQ_Scope/GeoTriplesID}";
+	];
+];
+.
+
+
+<#DQ_Scope>
+rml:logicalSource [
+	rml:source "outputxmlfile";
+	rml:referenceFormulation ql:XPath;
+	rml:iterator "/gmd:MD_Metadata/gmd:dataQualityInfo/gmd:DQ_DataQuality/gmd:scope/gmd:DQ_Scope";
+];
+rr:subjectMap [
+	rr:template "http://melodiesproject.eu/WP7/DQ_Scope/id/{dataset_name}/{GeoTriplesID}";
+	rr:class onto:DQ_Scope;
+];
+
+rr:predicateObjectMap [
+	rr:predicateMap [ rr:constant onto:hasLevel ];
+	rr:objectMap [
+		rr:template "http://melodiesproject.eu/WP7/Level/id/{dataset_name}/{gmd:level/GeoTriplesID}";
+	];
+];
+
+rr:predicateObjectMap [
+	rr:predicateMap [ rr:constant onto:hasLevelDescription ];
+	rr:objectMap [
+		rr:template "http://melodiesproject.eu/WP7/LevelDescription/id/{dataset_name}/{gmd:levelDescription/GeoTriplesID}";
+	];
+];
+.
+
+<#Level>
+rml:logicalSource [
+	rml:source "outputxmlfile";
+	rml:referenceFormulation ql:XPath;
+	rml:iterator "/gmd:MD_Metadata/gmd:dataQualityInfo/gmd:DQ_DataQuality/gmd:scope/gmd:DQ_Scope/gmd:level";
+];
+rr:subjectMap [
+	rr:template "http://melodiesproject.eu/WP7/Level/id/{dataset_name}/{GeoTriplesID}";
+	rr:class onto:Level;
+];
+
+rr:predicateObjectMap [
+	rr:predicateMap [ rr:constant onto:hasMD_ScopeCode ];
+	rr:objectMap [
+		rml:reference "gmd:MD_ScopeCode"
+	];
+];
+
+rr:predicateObjectMap [
+	rr:predicateMap [ rr:constant onto:hasValue ];
+	rr:objectMap [
+		rml:reference "gco:CharacterString"
+	];
+];
+.
+
+<#LevelDescription>
+rml:logicalSource [
+	rml:source "outputxmlfile";
+	rml:referenceFormulation ql:XPath;
+	rml:iterator "/gmd:MD_Metadata/gmd:dataQualityInfo/gmd:DQ_DataQuality/gmd:scope/gmd:DQ_Scope/gmd:levelDescription";
+];
+rr:subjectMap [
+	rr:template "http://melodiesproject.eu/WP7/LevelDescription/id/{dataset_name}/{GeoTriplesID}";
+	rr:class onto:LevelDescription;
+];
+.
+
+
+
+<#Lineage>
+rml:logicalSource [
+	rml:source "outputxmlfile";
+	rml:referenceFormulation ql:XPath;
+	rml:iterator "/gmd:MD_Metadata/gmd:dataQualityInfo/gmd:DQ_DataQuality/gmd:lineage";
+];
+rr:subjectMap [
+	rr:template "http://melodiesproject.eu/WP7/Lineage/id/{dataset_name}/{GeoTriplesID}";
+	rr:class onto:Lineage;
+];
+
+rr:predicateObjectMap [
+	rr:predicateMap [ rr:constant onto:hasLI_Lineage ];
+	rr:objectMap [
+		rr:template "http://melodiesproject.eu/WP7/LI_Lineage/id/{dataset_name}/{gmd:LI_Lineage/GeoTriplesID}";
+	];
+];
+.
+
+<#LI_Lineage>
+rml:logicalSource [
+	rml:source "outputxmlfile";
+	rml:referenceFormulation ql:XPath;
+	rml:iterator "/gmd:MD_Metadata/gmd:dataQualityInfo/gmd:DQ_DataQuality/gmd:lineage/gmd:LI_Lineage";
+];
+rr:subjectMap [
+	rr:template "http://melodiesproject.eu/WP7/LI_Lineage/id/{dataset_name}/{GeoTriplesID}";
+	rr:class onto:LI_Lineage;
+];
+
+rr:predicateObjectMap [
+	rr:predicateMap [ rr:constant onto:hasStatement ];
+	rr:objectMap [
+		rml:reference "gmd:statement/gco:CharacterString";
+	];
+];
+.

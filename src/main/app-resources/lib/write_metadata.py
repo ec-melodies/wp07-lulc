@@ -125,3 +125,14 @@ def write_metadata(outputfile,productid,product,DrySeason,WetSeason,gen_mmu):
     ET.SubElement(statement, "gco:CharacterString").text = DrySeason		
     tree = ET.ElementTree(root)
     tree.write(outputfile)
+
+def write_metadata_mapping(outputxmlfile,templatemappingfile,outputmappingfile):
+    with open(templatemappingfile) as f:
+        file_str = f.read()
+        file_str = file_str.replace("\"outputxmlfile\"","\""+outputxmlfile+"\"")
+    with open(outputmappingfile, "w+") as f:
+        f.write(file_str)
+
+def convert_to_geotriples(mappingfile,outputgeotriplesfile):
+    datasetname=os.path.splitext(os.path.basename(mappingfile))[0]
+    subprocess.call("geotriples dump_rdf -rml -ns /application/etc/namespaces_wp7.ns -o "+outputgeotriplesfile+" -variables \"dataset_name="+datasetname+"\" "+mappingfile, shell=True)

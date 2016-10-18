@@ -7,6 +7,7 @@
         <parameter id="years" title="Years" abstract="Set the Years(s) you want to generate" scope="runtime" maxOccurs="1"></parameter>
         <parameter id="MMU" title="MMU" abstract="Set the Minimum Mapping Unit in hectares for your final Land Cover map" scope="runtime" maxOccurs="1"></parameter>
         <parameter id="User_training_data" title="User training data" abstract="Paste link to User Training Data zip file" scope="runtime" maxOccurs="1"/>
+        <parameter id="User_config_file" title="User configuration file" abstract="Paste link to User Configuration file - variables.txt" scope="runtime" maxOccurs="1"/>
         <parameter id="JobID" title="JobID" abstract="teste" scope="runtime" maxOccurs="1"/>
       </defaultParameters>
       <defaultJobconf>
@@ -26,6 +27,7 @@
         <parameter id="years"></parameter>
         <parameter id="MMU">10</parameter>
         <parameter id="User_training_data">no</parameter>
+        <parameter id="User_config_file">no</parameter>
       </parameters>
     </node>
   </workflow>

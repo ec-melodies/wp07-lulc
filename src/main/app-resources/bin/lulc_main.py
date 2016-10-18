@@ -317,7 +317,7 @@ def main():
     ciop = cioppy.Cioppy()
     dirname=os.path.dirname
     appdir=os.path.abspath(os.path.join(os.path.dirname(__file__),".."))
-    variablesfile= os.path.join(appdir,'variables.txt')
+    variablesfile= os.path.join('/data','variables.txt')
     getVarFromFile(variablesfile)
     gisbase = data.gisbase
     gisdbase = data.gisdbase
@@ -344,6 +344,7 @@ def main():
     spatialr = data.spatialr
     maxiter = data.maxiter
     ranger = data.ranger
+    outputgeotriplesfile = data.outputgeotriplesfile
     threshold = data.threshold
     minsize = data.minsize
     tilesize = data.tilesize
@@ -602,7 +603,9 @@ def main():
                     grass.run_command('r.colors', map = gen_lulcmap, rules = lulc_color_path, quiet=True)
                     grass.run_command("r.out.gdal", input=gen_lulcmap, output=lulcmaptif, overwrite=True)				
 			    	#PUBLISH DATA
-                    write_metadata(lulcmaptif.replace('.tif','_metadata.xml'),gen_lulcmap,lulcmaptif,name_dry,name_wet,MMU)		
+                    write_metadata(lulcmaptif.replace('.tif','_metadata.xml'),gen_lulcmap,lulcmaptif,name_dry,name_wet,MMU)	
+                    write_metadata_mapping(lulcmaptif.replace('.tif','_metadata.xml'),"/application/etc/mapping_wp7.ttl",lulcmaptif.replace('.tif','_metadata.ttl'))
+                    convert_to_geotriples(lulcmaptif.replace('.tif','_metadata.ttl'),outputgeotriplesfile)					
                     ciop.publish(lulcmaptif, metalink = True)		
                     ciop.publish(lulcmaptif.replace('.tif','_metadata.xml'), metalink = True)
                     if p_aa==0:

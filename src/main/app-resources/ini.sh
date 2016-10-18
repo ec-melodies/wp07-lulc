@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# source the ciop functions (e.g. ciop-log)
+source ${ciop_job_include}
+
 # define variables
 Grassdir=/data/GRASS_data
 imagesfld=/data/images
@@ -9,19 +12,24 @@ Bin=/application/bin
 Extlib=/application/extlib
 Landsat_download=/opt/Landsat-Download
 Starspan=/usr/local/starspan/bin/
-# basepath=/usr/lib64/qt-3.3/bin:/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/sbin:
 anaconda=/opt/anaconda/bin/
  
 # define environment variables
 export executablefile=/data/main.sh
 export usgsfile=/data/usgs.txt
-export variablesfile=/application/variables.txt
+export variablesfile=/data/variables.txt
 export proxyfile=/data/proxy.txt
 export Landsat_download=$Landsat_download
 export PATH=$anaconda:$Bin:$Lib:$Extlib:$Landsat_download:$Starspan:$Landsat_LDOPE:$PATH
 export PYTHONPATH=$Lib:$anaconda
 export LD_LIBRARY_PATH=/usr/local/lib/otb
 export GDAL_DATA=/application/gdal
+
+# Get user defined configurations file
+ucf="`ciop-getparam User_config_file`"
+if [[ $ucf != "no" ]]; then
+	curl $ucf -o $variablesfile
+fi
 
 # read some variables from variables.txt
 while IFS='' read -r line || [[ -n "$line" ]]; do
@@ -51,7 +59,7 @@ done < $variablesfile
 #syncronize final data files
 echo "---Syncronizing files with S3 storage---"
 mkdir ${outputpath//\'/} -p
-s3cmd -f sync s3://final-data ${outputpath//\'/} --skip-existing
+s3cmd sync s3://final-data ${outputpath//\'/} --skip-existing
 
 #create images folder and needed files
 mkdir $imagesfld -p
