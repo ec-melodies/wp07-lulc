@@ -79,7 +79,7 @@ def getlandsats(years,tiles,admitedcloudcover,outputdir,outputcatalogs,credentia
                         # print 'download_landsat_scene.py -z unzip -b '+bird+' -o catalog -d '+startdate+' -f '+enddate+admitedcloudcover+' -k noupdate -s '+tile+' -u '+credentialsfile+' -p '+proxy_path+' --output '+outputdir+' --outputcatalogs '+outputcatalogs						
                     #else:					
                         #subprocess.call('download_landsat_scene.py -z unzip -b '+bird+' -o catalog -d '+startdate+' -f '+enddate+admitedcloudcover+' -k noupdate -s '+tile+' -u '+credentialsfile+' --output '+outputdir+' --outputcatalogs '+outputcatalogs, shell=True)
-                    subprocess.call('fetchFromGoogleCloud.py -s '+tile+' -d '+startdate+' -f '+enddate+admitedcloudcover+' --output '+outputdir+' --outputcatalogs '+outputcatalogs, shell=True)
+                    subprocess.call('python /application/lib/fetchFromGoogleCloud.py -s '+tile+' -d '+startdate+' -f '+enddate+admitedcloudcover+' --output '+outputdir+' --outputcatalogs '+outputcatalogs, shell=True)
                     l = open(logfile,'r')
                     images=l.read().translate(None, '\n[]\'')
                     if images!='':		
