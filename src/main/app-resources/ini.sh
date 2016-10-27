@@ -36,24 +36,24 @@ while IFS='' read -r line || [[ -n "$line" ]]; do
             if [[ $line == *"non_grass_outputpath"* ]]; then
                export outputpath=${line:21}
             fi
-			if [[ $line == *"proxy_user"* ]]; then
-               export proxy_user=${line:11}
-            fi
-			if [[ $line == *"proxy_passwd"* ]]; then
-               export proxy_passwd=${line:13}
-            fi
-			if [[ $line == *"proxy_host"* ]]; then
-               export proxy_host=${line:11}
-            fi
-			if [[ $line == *"proxy_port"* ]]; then
-               export proxy_port=${line:11}
-            fi	
-			if [[ $line == *"usgs_user"* ]]; then
-               export usgs_user=${line:10}
-            fi
-			if [[ $line == *"usgs_passwd"* ]]; then
-               export usgs_passwd=${line:12}
-            fi				
+			# if [[ $line == *"proxy_user"* ]]; then
+               # export proxy_user=${line:11}
+            # fi
+			# if [[ $line == *"proxy_passwd"* ]]; then
+               # export proxy_passwd=${line:13}
+            # fi
+			# if [[ $line == *"proxy_host"* ]]; then
+               # export proxy_host=${line:11}
+            # fi
+			# if [[ $line == *"proxy_port"* ]]; then
+               # export proxy_port=${line:11}
+            # fi	
+			# if [[ $line == *"usgs_user"* ]]; then
+               # export usgs_user=${line:10}
+            # fi
+			# if [[ $line == *"usgs_passwd"* ]]; then
+               # export usgs_passwd=${line:12}
+            # fi				
 done < $variablesfile
 
 #syncronize final data files
@@ -66,8 +66,8 @@ mkdir $imagesfld -p
 if [ ! -f $imagesfld/log.txt ]; then
     echo -e " " > $imagesfld/log.txt
 fi
-echo -e "${usgs_user//"'"/} ${usgs_passwd//"'"/}" > $usgsfile
-echo -e "${proxy_user//"'"/} ${proxy_passwd//"'"/}\n${proxy_host//"'"/}\n${proxy_port//"'"/}" > $proxyfile
+# echo -e "${usgs_user//"'"/} ${usgs_passwd//"'"/}" > $usgsfile
+# echo -e "${proxy_user//"'"/} ${proxy_passwd//"'"/}\n${proxy_host//"'"/}\n${proxy_port//"'"/}" > $proxyfile
 
 #run job for each tile
 while read tile; do
@@ -87,8 +87,8 @@ else
 fi
 
 rm $executablefile
-rm $usgsfile
-rm $proxyfile
+# rm $usgsfile
+# rm $proxyfile
 
 done
 
