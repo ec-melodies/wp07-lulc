@@ -240,11 +240,11 @@ def read_wps_form(param):
         yearsdict = {}
         for y in years:
             if (1999<=int(y)<=2003):
-                yearsdict[y]='LE7'
+                yearsdict[y]='ETM'
             elif(2003<int(y)<2013):
-                yearsdict[y]='LT5'
+                yearsdict[y]='TM'
             elif(int(y)>=2013):
-                yearsdict[y]='LC8'
+                yearsdict[y]='OLI_TIRS'
             yearsdict.update(yearsdict)
         years=yearsdict 
 	return years
