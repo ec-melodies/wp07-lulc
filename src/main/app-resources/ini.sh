@@ -18,6 +18,7 @@ anaconda=/opt/anaconda/bin/
 export executablefile=/data/main.sh
 export usgsfile=/data/usgs.txt
 export variablesfile=/data/variables.txt
+export defaultVariablesFile=/application/variables.txt
 export proxyfile=/data/proxy.txt
 export Landsat_download=$Landsat_download
 export PATH=$anaconda:$Bin:$Lib:$Extlib:$Landsat_download:$Starspan:$Landsat_LDOPE:$PATH
@@ -29,6 +30,8 @@ export GDAL_DATA=/application/gdal
 ucf="`ciop-getparam User_config_file`"
 if [[ $ucf != "no" ]]; then
 	curl $ucf -o $variablesfile
+else
+	curl $defaultVariablesFile -o $variablesfile
 fi
 
 # read some variables from variables.txt
