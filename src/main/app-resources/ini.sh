@@ -31,7 +31,7 @@ ucf="`ciop-getparam User_config_file`"
 if [[ $ucf != "no" ]]; then
 	curl $ucf -o $variablesfile
 else
-	curl $defaultVariablesFile -o $variablesfile
+	cp $defaultVariablesFile $variablesfile
 fi
 
 # read some variables from variables.txt
